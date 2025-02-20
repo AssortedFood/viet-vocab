@@ -1,12 +1,6 @@
 # TODO
 
-- create getCategories()
 - create editVocab(id)
-
-- structure output request whenever a tile is added to:
-    - fix the accents used in the tile (e.g. cam on -> Cám Ơn)
-    - append a modified translation to the existing english translation iff the existing one is totally incorrect
-    - use getCategories to attempt to find a suitable existing category (make a new one if needed)
 
 ### UI changes
 

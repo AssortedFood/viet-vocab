@@ -1,7 +1,6 @@
 // app/vocab/page.js
 "use client";
-import { useState, useEffect, useRef } from "react";
-import { addVocab, getAllVocab, deleteVocab, updateFamiliarity } from "@/lib/vocab";
+import { useState, useEffect } from "react";
 
 export default function VocabPage() {
   const [vocabList, setVocabList] = useState([]);
@@ -9,60 +8,117 @@ export default function VocabPage() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [newWord, setNewWord] = useState({ word: "", translation: "", description: "", category: "" });
-  const observer = useRef(null);
+  const [showAddWord, setShowAddWord] = useState(false); // Toggle form visibility
 
   useEffect(() => {
     loadVocab();
   }, [sortBy, categoryFilter]);
 
+  // Fetch vocab from API
   const loadVocab = async () => {
     setLoading(true);
-    const data = await getAllVocab({ sortBy, category: categoryFilter || null });
-    setVocabList(data);
+    try {
+      const res = await fetch(`/api/vocab?sortBy=${sortBy}&category=${categoryFilter}`);
+      const data = await res.json();
+      setVocabList(data);
+    } catch (error) {
+      console.error("Error loading vocab:", error);
+    }
     setLoading(false);
   };
 
+  // Add new vocab via API
   const handleAddVocab = async () => {
     if (!newWord.word || !newWord.translation) return;
-    await addVocab(newWord.word, newWord.translation, newWord.description, newWord.category);
-    setNewWord({ word: "", translation: "", description: "", category: "" });
-    loadVocab();
+    
+    try {
+      await fetch("/api/vocab", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newWord),
+      });
+      
+      setNewWord({ word: "", translation: "", description: "", category: "" });
+      setShowAddWord(false); // Close form after adding
+      loadVocab(); // Refresh vocab list
+    } catch (error) {
+      console.error("Error adding vocab:", error);
+    }
   };
 
+  // Delete vocab via API
   const handleDeleteVocab = async (id) => {
-    await deleteVocab(id);
-    setVocabList(vocabList.filter((word) => word.id !== id));
+    try {
+      await fetch(`/api/vocab?id=${id}`, { method: "DELETE" });
+      setVocabList(vocabList.filter((word) => word.id !== id));
+    } catch (error) {
+      console.error("Error deleting vocab:", error);
+    }
   };
 
+  // Update familiarity via API
   const handleFamiliarityUpdate = async (id, score) => {
-    await updateFamiliarity(id, score);
-    setVocabList(vocabList.map((word) => (word.id === id ? { ...word, familiarity: score } : word)));
+    try {
+      await fetch("/api/vocab", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, score }),
+      });
+      
+      setVocabList(vocabList.map((word) => 
+        word.id === id ? { ...word, familiarity: score } : word
+      ));
+    } catch (error) {
+      console.error("Error updating familiarity:", error);
+    }
   };
 
   return (
     <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
+      {/* Toggle Add Word Form Button */}
+      <button 
+        onClick={() => setShowAddWord(!showAddWord)} 
+        style={{ width: "100%", padding: "10px", background: "#007bff", color: "#fff", border: "none", marginBottom: "10px" }}>
+        {showAddWord ? "✖ Close" : "➕ Add New Word"}
+      </button>
 
       {/* Add New Word Section */}
-      <div style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "20px" }}>
-        <h2>Add a New Word</h2>
-        <input
-          type="text"
-          placeholder="Vietnamese"
-          value={newWord.word}
-          onChange={(e) => setNewWord({ ...newWord, word: e.target.value })}
-          style={{ width: "100%", marginBottom: "5px", padding: "5px" }}
-        />
-        <input
-          type="text"
-          placeholder="English Translation"
-          value={newWord.translation}
-          onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })}
-          style={{ width: "100%", marginBottom: "5px", padding: "5px" }}
-        />
-        <button onClick={handleAddVocab} style={{ width: "100%", padding: "10px", background: "#007bff", color: "#fff", border: "none" }}>
-          ➕ Add Word
-        </button>
-      </div>
+      {showAddWord && (
+        <div style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "20px" }}>
+          <h4>Add a New Word</h4>
+          <input
+            type="text"
+            placeholder="Vietnamese"
+            value={newWord.word}
+            onChange={(e) => setNewWord({ ...newWord, word: e.target.value })}
+            style={{ width: "100%", marginBottom: "5px", padding: "5px" }}
+          />
+          <input
+            type="text"
+            placeholder="English Translation"
+            value={newWord.translation}
+            onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })}
+            style={{ width: "100%", marginBottom: "5px", padding: "5px" }}
+          />
+          <input
+            type="text"
+            placeholder="Description (optional)"
+            value={newWord.description}
+            onChange={(e) => setNewWord({ ...newWord, description: e.target.value })}
+            style={{ width: "100%", marginBottom: "5px", padding: "5px" }}
+          />
+          <input
+            type="text"
+            placeholder="Category (optional)"
+            value={newWord.category}
+            onChange={(e) => setNewWord({ ...newWord, category: e.target.value })}
+            style={{ width: "100%", marginBottom: "10px", padding: "5px" }}
+          />
+          <button onClick={handleAddVocab} style={{ width: "100%", padding: "10px", background: "#28a745", color: "#fff", border: "none" }}>
+            ➕ Add Word
+          </button>
+        </div>
+      )}
 
       {/* Sorting & Filtering */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
