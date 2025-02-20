@@ -9,6 +9,7 @@ export default function VocabPage() {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [newWord, setNewWord] = useState({ word: "", translation: "", description: "", category: "" });
   const [showAddWord, setShowAddWord] = useState(false);
+  const [editingWord, setEditingWord] = useState(null); // Track editing state
 
   useEffect(() => {
     loadVocab();
@@ -73,10 +74,42 @@ export default function VocabPage() {
     }
   };
 
+  // Enable editing mode for a vocab word
+  const startEditing = (word) => {
+    setEditingWord({ ...word });
+  };
+
+  // Handle input changes while editing
+  const handleEditChange = (field, value) => {
+    setEditingWord((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Save edited vocab entry via API
+  const handleEditSave = async (id) => {
+    if (!editingWord.word || !editingWord.translation) return;
+  
+    try {
+      const res = await fetch("/api/vocab", {
+        method: "PATCH", // ✅ Fix here (was "PUT")
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, ...editingWord }),
+      });
+  
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("❌ Edit Error:", errorData);
+        return;
+      }
+  
+      setEditingWord(null); // Exit editing mode
+      loadVocab(); // Refresh list
+    } catch (error) {
+      console.error("❌ Error updating vocab:", error);
+    }
+  };
+
   return (
     <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
-      <h1>📖 Your Vocabulary List</h1>
-
       {/* Toggle Add Word Form Button */}
       <button
         onClick={() => setShowAddWord(!showAddWord)}
@@ -153,23 +186,25 @@ export default function VocabPage() {
         <div>
           {vocabList.map((word) => (
             <div key={word.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0", display: "flex", alignItems: "center" }}>
-              <div style={{ flex: 1 }}>
-                <strong>{word.word}</strong> → {word.translation}
-                <br />
-                <small>{word.description}</small>
-                <br />
-                <em>Category: {word.category || "None"}</em>
-              </div>
-              <div>
-                <button onClick={() => handleFamiliarityUpdate(word.id, 1)}>😟</button>
-                <button onClick={() => handleFamiliarityUpdate(word.id, 2)}>😐</button>
-                <button onClick={() => handleFamiliarityUpdate(word.id, 3)}>🙂</button>
-              </div>
-              <button
-                onClick={() => handleDeleteVocab(word.id)}
-                style={{ marginLeft: "10px", color: "red", border: "none", background: "none" }}>
-                🗑️
-              </button>
+              {editingWord?.id === word.id ? (
+                <div style={{ flex: 1 }}>
+                  <input type="text" value={editingWord.word} onChange={(e) => handleEditChange("word", e.target.value)} />
+                  <input type="text" value={editingWord.translation} onChange={(e) => handleEditChange("translation", e.target.value)} />
+                  <input type="text" value={editingWord.description} onChange={(e) => handleEditChange("description", e.target.value)} />
+                  <input type="text" value={editingWord.category} onChange={(e) => handleEditChange("category", e.target.value)} />
+                  <button onClick={() => handleEditSave(word.id)}>✅ Save</button>
+                </div>
+              ) : (
+                <div style={{ flex: 1 }}>
+                  <strong>{word.word}</strong> → {word.translation}
+                  <br />
+                  <small>{word.description}</small>
+                  <br />
+                  <em>Category: {word.category || "None"}</em>
+                </div>
+              )}
+              <button onClick={() => startEditing(word)}>✏️</button>
+              <button onClick={() => handleDeleteVocab(word.id)}>🗑️</button>
             </div>
           ))}
         </div>

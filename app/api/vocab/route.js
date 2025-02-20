@@ -1,6 +1,6 @@
 // app/api/vocab/route.js
 "use server";
-import { getAllVocab, addVocab, deleteVocab, updateFamiliarity } from "@/lib/vocab";
+import { getAllVocab, addVocab, deleteVocab, updateFamiliarity, editVocab } from "@/lib/vocab";
 
 // Handle GET request - Fetch vocab list
 export async function GET(req) {
@@ -68,3 +68,22 @@ export async function PUT(req) {
     return Response.json({ error: "Failed to update familiarity" }, { status: 500 });
   }
 }
+
+// Handle PATCH request - Edit vocab entry
+export async function PATCH(req) {
+    try {
+      const { id, word, translation, description = "", category = "" } = await req.json();
+  
+      console.log("🔍 PATCH Request Data:", { id, word, translation, description, category });
+  
+      if (!id || !word || !translation) {
+        return Response.json({ error: "ID, word, and translation are required." }, { status: 400 });
+      }
+  
+      await editVocab(id, word, translation, description, category);
+      return Response.json({ success: true, updatedID: id }, { status: 200 });
+    } catch (error) {
+      console.error("❌ Error editing vocab:", error);
+      return Response.json({ error: "Failed to edit vocab" }, { status: 500 });
+    }
+  }

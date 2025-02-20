@@ -1,7 +1,5 @@
 # TODO
 
-- create editVocab(id)
-
 ### UI changes
 
 - add word should be a button that expands it, button tucked away from the vocab list
