@@ -1,6 +1,5 @@
 # TODO
 
-- remove description field
 - remove category field from ui
 
 - create getCategories()
