@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 
 export default function VocabPage() {
-  const [vocabList, setVocabList] = useState([]);
+  const [vocabList, setVocabList] = useState(null); // Ensures SSR & Client match
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("createdAt");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [newWord, setNewWord] = useState({ word: "", translation: "", description: "", category: "" });
-  const [showAddWord, setShowAddWord] = useState(false); // Toggle form visibility
+  const [showAddWord, setShowAddWord] = useState(false);
 
   useEffect(() => {
     loadVocab();
@@ -30,14 +30,14 @@ export default function VocabPage() {
   // Add new vocab via API
   const handleAddVocab = async () => {
     if (!newWord.word || !newWord.translation) return;
-    
+
     try {
       await fetch("/api/vocab", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newWord),
       });
-      
+
       setNewWord({ word: "", translation: "", description: "", category: "" });
       setShowAddWord(false); // Close form after adding
       loadVocab(); // Refresh vocab list
@@ -50,7 +50,7 @@ export default function VocabPage() {
   const handleDeleteVocab = async (id) => {
     try {
       await fetch(`/api/vocab?id=${id}`, { method: "DELETE" });
-      setVocabList(vocabList.filter((word) => word.id !== id));
+      setVocabList((prevList) => prevList.filter((word) => word.id !== id));
     } catch (error) {
       console.error("Error deleting vocab:", error);
     }
@@ -64,10 +64,10 @@ export default function VocabPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, score }),
       });
-      
-      setVocabList(vocabList.map((word) => 
-        word.id === id ? { ...word, familiarity: score } : word
-      ));
+
+      setVocabList((prevList) =>
+        prevList.map((word) => (word.id === id ? { ...word, familiarity: score } : word))
+      );
     } catch (error) {
       console.error("Error updating familiarity:", error);
     }
@@ -75,9 +75,11 @@ export default function VocabPage() {
 
   return (
     <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
+      <h1>📖 Your Vocabulary List</h1>
+
       {/* Toggle Add Word Form Button */}
-      <button 
-        onClick={() => setShowAddWord(!showAddWord)} 
+      <button
+        onClick={() => setShowAddWord(!showAddWord)}
         style={{ width: "100%", padding: "10px", background: "#007bff", color: "#fff", border: "none", marginBottom: "10px" }}>
         {showAddWord ? "✖ Close" : "➕ Add New Word"}
       </button>
@@ -114,7 +116,9 @@ export default function VocabPage() {
             onChange={(e) => setNewWord({ ...newWord, category: e.target.value })}
             style={{ width: "100%", marginBottom: "10px", padding: "5px" }}
           />
-          <button onClick={handleAddVocab} style={{ width: "100%", padding: "10px", background: "#28a745", color: "#fff", border: "none" }}>
+          <button
+            onClick={handleAddVocab}
+            style={{ width: "100%", padding: "10px", background: "#28a745", color: "#fff", border: "none" }}>
             ➕ Add Word
           </button>
         </div>
@@ -137,30 +141,39 @@ export default function VocabPage() {
         />
       </div>
 
-      {/* Vocabulary List */}
+      {/* Loading State */}
       {loading && <p>Loading...</p>}
-      {!loading && vocabList.length === 0 && <p>No words found.</p>}
-      <div>
-        {vocabList.map((word) => (
-          <div key={word.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0", display: "flex", alignItems: "center" }}>
-            <div style={{ flex: 1 }}>
-              <strong>{word.word}</strong> → {word.translation}
-              <br />
-              <small>{word.description}</small>
-              <br />
-              <em>Category: {word.category || "None"}</em>
+
+      {/* Error Handling */}
+      {!loading && vocabList === null && <p>Error loading vocabulary.</p>}
+      {!loading && vocabList?.length === 0 && <p>No words found.</p>}
+
+      {/* Vocabulary List */}
+      {!loading && vocabList && (
+        <div>
+          {vocabList.map((word) => (
+            <div key={word.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0", display: "flex", alignItems: "center" }}>
+              <div style={{ flex: 1 }}>
+                <strong>{word.word}</strong> → {word.translation}
+                <br />
+                <small>{word.description}</small>
+                <br />
+                <em>Category: {word.category || "None"}</em>
+              </div>
+              <div>
+                <button onClick={() => handleFamiliarityUpdate(word.id, 1)}>😟</button>
+                <button onClick={() => handleFamiliarityUpdate(word.id, 2)}>😐</button>
+                <button onClick={() => handleFamiliarityUpdate(word.id, 3)}>🙂</button>
+              </div>
+              <button
+                onClick={() => handleDeleteVocab(word.id)}
+                style={{ marginLeft: "10px", color: "red", border: "none", background: "none" }}>
+                🗑️
+              </button>
             </div>
-            <div>
-              <button onClick={() => handleFamiliarityUpdate(word.id, 1)}>😟</button>
-              <button onClick={() => handleFamiliarityUpdate(word.id, 2)}>😐</button>
-              <button onClick={() => handleFamiliarityUpdate(word.id, 3)}>🙂</button>
-            </div>
-            <button onClick={() => handleDeleteVocab(word.id)} style={{ marginLeft: "10px", color: "red", border: "none", background: "none" }}>
-              🗑️
-            </button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
