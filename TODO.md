@@ -1,7 +1,5 @@
 # TODO
 
-- remove category field from ui
-
 - create getCategories()
 - create editVocab(id)
 
@@ -12,7 +10,6 @@
 
 ### UI changes
 
-- remove heading -> make the whole page more minimalist
 - add word should be a button that expands it, button tucked away from the vocab list
 - dark/light mode
 - colours.js
