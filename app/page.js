@@ -21,7 +21,7 @@ export default function VocabPage() {
   const loadVocab = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/vocab?sortBy=${sortBy}&category=${categoryFilter}`);
+      const res = await fetch(`/api/vocab?sortBy=${sortBy}&category=${encodeURIComponent(categoryFilter)}`);
       const data = await res.json();
       setVocabList(data);
     } catch (error) {
