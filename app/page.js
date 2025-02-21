@@ -1,9 +1,9 @@
-// app/page.js
+// app/vocab/page.js
 "use client";
 import { useState, useEffect } from "react";
 
 export default function VocabPage() {
-  const [vocabList, setVocabList] = useState([]); // Default to empty array to match SSR
+  const [vocabList, setVocabList] = useState(null); // Ensures SSR & Client match
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("createdAt");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -19,9 +19,9 @@ export default function VocabPage() {
   const loadVocab = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/vocab?sortBy=${sortBy}&category=${categoryFilter}`, { cache: "no-store" });
+      const res = await fetch(`/api/vocab?sortBy=${sortBy}&category=${categoryFilter}`);
       const data = await res.json();
-      setVocabList(data || []); // Ensure it is always an array
+      setVocabList(data);
     } catch (error) {
       console.error("Error loading vocab:", error);
     }
@@ -178,20 +178,31 @@ export default function VocabPage() {
       {loading && <p>Loading...</p>}
 
       {/* Error Handling */}
-      {!loading && vocabList.length === 0 && <p>No words found.</p>}
+      {!loading && vocabList === null && <p>Error loading vocabulary.</p>}
+      {!loading && vocabList?.length === 0 && <p>No words found.</p>}
 
       {/* Vocabulary List */}
-      {!loading && vocabList.length > 0 && (
+      {!loading && vocabList && (
         <div>
           {vocabList.map((word) => (
             <div key={word.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0", display: "flex", alignItems: "center" }}>
-              <div style={{ flex: 1 }}>
-                <strong>{word.word}</strong> → {word.translation}
-                <br />
-                <small>{word.description}</small>
-                <br />
-                <em>Category: {word.category || "None"}</em>
-              </div>
+              {editingWord?.id === word.id ? (
+                <div style={{ flex: 1 }}>
+                  <input type="text" value={editingWord.word} onChange={(e) => handleEditChange("word", e.target.value)} />
+                  <input type="text" value={editingWord.translation} onChange={(e) => handleEditChange("translation", e.target.value)} />
+                  <input type="text" value={editingWord.description} onChange={(e) => handleEditChange("description", e.target.value)} />
+                  <input type="text" value={editingWord.category} onChange={(e) => handleEditChange("category", e.target.value)} />
+                  <button onClick={() => handleEditSave(word.id)}>✅ Save</button>
+                </div>
+              ) : (
+                <div style={{ flex: 1 }}>
+                  <strong>{word.word}</strong> → {word.translation}
+                  <br />
+                  <small>{word.description}</small>
+                  <br />
+                  <em>Category: {word.category || "None"}</em>
+                </div>
+              )}
               <button onClick={() => startEditing(word)}>✏️</button>
               <button onClick={() => handleDeleteVocab(word.id)}>🗑️</button>
             </div>
