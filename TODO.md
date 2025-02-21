@@ -1,8 +1,4 @@
 # TODO
 
-- general UI improvements
-    - familiarity button is highlighted based on current score
-    - nice colours
-    - use MUI
-    - dark/light mode?
-    - optimise for vertical mobile use
+- reproduce edit button functionality -  now broken
+- Category filtering should allow partial matches

@@ -92,7 +92,7 @@ export default function VocabPage() {
   
     try {
       const res = await fetch("/api/vocab", {
-        method: "PATCH", // ✅ Fix here (was "PUT")
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, ...editingWord }),
       });
@@ -104,14 +104,23 @@ export default function VocabPage() {
       }
   
       setEditingWord(null); // Exit editing mode
-      loadVocab(); // Refresh list
+      loadVocab(); // Refresh list to reflect changes
     } catch (error) {
       console.error("❌ Error updating vocab:", error);
     }
   };
+  
 
   return (
-    <Container maxWidth="sm" sx={{ padding: "20px", backgroundColor: "background.default" }}>
+    <Container
+      sx={{ 
+        padding: "20px", 
+        backgroundColor: "background.default", 
+        minHeight: "100vh", // Ensures it fills the screen
+        overflowY: "auto", // Allows scrolling when expanded
+      }}
+    >
+
       {/* Toggle Add Word Form Button */}
       <Button 
         variant="contained" 
@@ -128,25 +137,14 @@ export default function VocabPage() {
         <div style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "20px" }}>
           <TextField fullWidth label="Vietnamese" value={newWord.word} onChange={(e) => setNewWord({ ...newWord, word: e.target.value })} sx={{ marginBottom: "10px" }} />
           <TextField fullWidth label="English Translation" value={newWord.translation} onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })} sx={{ marginBottom: "10px" }} />
-          <Button variant="contained" color="success" fullWidth onClick={handleAddVocab}>
+          <Button variant="contained" color="success" fullWidth onClick={handleAddVocab} 
+        sx={{ marginBottom: "10px", bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}>
             Add Word
           </Button>
         </div>
       )}
 
-      {/* Sorting & Filtering */}
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-      <Select 
-        fullWidth 
-        value={sortBy} 
-        onChange={(e) => setSortBy(e.target.value)} 
-        sx={{ bgcolor: "background.paper", borderRadius: "5px", marginBottom: "10px" }}
-      >
-        <MenuItem value="createdAt">Sort by: Date Added</MenuItem>
-        <MenuItem value="familiarity">Sort by: Familiarity</MenuItem>
-        <MenuItem value="category">Sort by: Category</MenuItem>
-      </Select>
-
+      {/* Category Filter - Full Width */}
       <TextField 
         fullWidth 
         label="Filter by Category" 
@@ -156,8 +154,6 @@ export default function VocabPage() {
         sx={{ bgcolor: "background.paper", borderRadius: "5px", marginBottom: "10px" }}
       />
 
-      </div>
-
       {/* Loading State */}
       {loading && <CircularProgress sx={{ display: "block", margin: "20px auto" }} />}
 
@@ -166,11 +162,47 @@ export default function VocabPage() {
       {!loading && vocabList?.length === 0 && <p>No words found.</p>}
 
       {/* Vocabulary List */}
-      {!loading && vocabList && (
-        <div>
-          {vocabList.map((word) => (
-            <Card key={word.id} sx={{ marginBottom: "10px", padding: "10px" }}>
-              <CardContent>
+      {(vocabList || []).map((word) => (
+        <Card key={word.id} sx={{ marginBottom: "10px", padding: "10px" }}>
+          <CardContent>
+            {editingWord?.id === word.id ? (
+              // If editing, show editable inputs
+              <>
+                <TextField
+                  fullWidth
+                  label="Vietnamese"
+                  value={editingWord.word}
+                  onChange={(e) => handleEditChange("word", e.target.value)}
+                  sx={{ marginBottom: "5px" }}
+                />
+                <TextField
+                  fullWidth
+                  label="English Translation"
+                  value={editingWord.translation}
+                  onChange={(e) => handleEditChange("translation", e.target.value)}
+                  sx={{ marginBottom: "5px" }}
+                />
+                <div style={{ display: "flex", gap: "10px", marginTop: "5px" }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleEditSave(word.id)}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => setEditingWord(null)} // Cancels editing
+                  >
+                    Cancel
+                  </Button>
+                </div>
+
+              </>
+            ) : (
+              // Otherwise, show normal text
+              <>
                 <Typography variant="h6">{word.word} → {word.translation}</Typography>
                 <Typography variant="body2" color="textSecondary">{word.description}</Typography>
                 <Typography variant="caption">Category: {word.category || "None"}</Typography>
@@ -178,11 +210,11 @@ export default function VocabPage() {
                   <IconButton color="primary" onClick={() => startEditing(word)}><Edit /></IconButton>
                   <IconButton color="secondary" onClick={() => handleDeleteVocab(word.id)}><Delete /></IconButton>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+      ))}
       </Container>
   );
 }

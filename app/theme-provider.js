@@ -34,6 +34,19 @@ export default function AppThemeProvider({ children }) {
             },
           },
         },
+        MuiButton: {
+          styleOverrides: {
+            root: {
+              textTransform: "none", // ✅ Prevent all-caps
+              borderRadius: "8px",
+              fontWeight: "bold",
+              fontFamily: "var(--font-geist-sans), Arial, sans-serif",
+              "&:hover": {
+                backgroundColor: "#342E41",
+              },
+            },
+          },
+        },
       },
     }), []
   );
