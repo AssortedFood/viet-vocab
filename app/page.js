@@ -1,6 +1,8 @@
 // app/vocab/page.js
 "use client";
 import { useState, useEffect } from "react";
+import { Container, TextField, Button, Select, MenuItem, Card, CardContent, Typography, IconButton, CircularProgress } from "@mui/material";
+import { Add, Edit, Delete } from "@mui/icons-material";
 
 export default function VocabPage() {
   const [vocabList, setVocabList] = useState(null); // Ensures SSR & Client match
@@ -109,73 +111,55 @@ export default function VocabPage() {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
+    <Container maxWidth="sm" sx={{ padding: "20px", backgroundColor: "background.default" }}>
       {/* Toggle Add Word Form Button */}
-      <button
-        onClick={() => setShowAddWord(!showAddWord)}
-        style={{ width: "100%", padding: "10px", background: "#007bff", color: "#fff", border: "none", marginBottom: "10px" }}>
-        {showAddWord ? "✖ Close" : "➕ Add New Word"}
-      </button>
+      <Button 
+        variant="contained" 
+        startIcon={<Add />} 
+        fullWidth 
+        onClick={() => setShowAddWord(!showAddWord)} 
+        sx={{ marginBottom: "10px", bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}
+      >
+        {showAddWord ? "Close" : "Add New Word"}
+      </Button>
 
       {/* Add New Word Section */}
       {showAddWord && (
         <div style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "20px" }}>
-          <h4>Add a New Word</h4>
-          <input
-            type="text"
-            placeholder="Vietnamese"
-            value={newWord.word}
-            onChange={(e) => setNewWord({ ...newWord, word: e.target.value })}
-            style={{ width: "100%", marginBottom: "5px", padding: "5px" }}
-          />
-          <input
-            type="text"
-            placeholder="English Translation"
-            value={newWord.translation}
-            onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })}
-            style={{ width: "100%", marginBottom: "5px", padding: "5px" }}
-          />
-          <input
-            type="text"
-            placeholder="Description (optional)"
-            value={newWord.description}
-            onChange={(e) => setNewWord({ ...newWord, description: e.target.value })}
-            style={{ width: "100%", marginBottom: "5px", padding: "5px" }}
-          />
-          <input
-            type="text"
-            placeholder="Category (optional)"
-            value={newWord.category}
-            onChange={(e) => setNewWord({ ...newWord, category: e.target.value })}
-            style={{ width: "100%", marginBottom: "10px", padding: "5px" }}
-          />
-          <button
-            onClick={handleAddVocab}
-            style={{ width: "100%", padding: "10px", background: "#28a745", color: "#fff", border: "none" }}>
-            ➕ Add Word
-          </button>
+          <TextField fullWidth label="Vietnamese" value={newWord.word} onChange={(e) => setNewWord({ ...newWord, word: e.target.value })} sx={{ marginBottom: "10px" }} />
+          <TextField fullWidth label="English Translation" value={newWord.translation} onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })} sx={{ marginBottom: "10px" }} />
+          <Button variant="contained" color="success" fullWidth onClick={handleAddVocab}>
+            Add Word
+          </Button>
         </div>
       )}
 
       {/* Sorting & Filtering */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-          <option value="createdAt">Sort by: Date Added</option>
-          <option value="familiarity">Sort by: Familiarity</option>
-          <option value="category">Sort by: Category</option>
-        </select>
+      <Select 
+        fullWidth 
+        value={sortBy} 
+        onChange={(e) => setSortBy(e.target.value)} 
+        sx={{ bgcolor: "background.paper", borderRadius: "5px", marginBottom: "10px" }}
+      >
+        <MenuItem value="createdAt">Sort by: Date Added</MenuItem>
+        <MenuItem value="familiarity">Sort by: Familiarity</MenuItem>
+        <MenuItem value="category">Sort by: Category</MenuItem>
+      </Select>
 
-        <input
-          type="text"
-          placeholder="Filter by Category"
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-          style={{ padding: "5px" }}
-        />
+      <TextField 
+        fullWidth 
+        label="Filter by Category" 
+        value={categoryFilter} 
+        onChange={(e) => setCategoryFilter(e.target.value)} 
+        variant="outlined"
+        sx={{ bgcolor: "background.paper", borderRadius: "5px", marginBottom: "10px" }}
+      />
+
       </div>
 
       {/* Loading State */}
-      {loading && <p>Loading...</p>}
+      {loading && <CircularProgress sx={{ display: "block", margin: "20px auto" }} />}
 
       {/* Error Handling */}
       {!loading && vocabList === null && <p>Error loading vocabulary.</p>}
@@ -185,30 +169,20 @@ export default function VocabPage() {
       {!loading && vocabList && (
         <div>
           {vocabList.map((word) => (
-            <div key={word.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0", display: "flex", alignItems: "center" }}>
-              {editingWord?.id === word.id ? (
-                <div style={{ flex: 1 }}>
-                  <input type="text" value={editingWord.word} onChange={(e) => handleEditChange("word", e.target.value)} />
-                  <input type="text" value={editingWord.translation} onChange={(e) => handleEditChange("translation", e.target.value)} />
-                  <input type="text" value={editingWord.description} onChange={(e) => handleEditChange("description", e.target.value)} />
-                  <input type="text" value={editingWord.category} onChange={(e) => handleEditChange("category", e.target.value)} />
-                  <button onClick={() => handleEditSave(word.id)}>✅ Save</button>
+            <Card key={word.id} sx={{ marginBottom: "10px", padding: "10px" }}>
+              <CardContent>
+                <Typography variant="h6">{word.word} → {word.translation}</Typography>
+                <Typography variant="body2" color="textSecondary">{word.description}</Typography>
+                <Typography variant="caption">Category: {word.category || "None"}</Typography>
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+                  <IconButton color="primary" onClick={() => startEditing(word)}><Edit /></IconButton>
+                  <IconButton color="secondary" onClick={() => handleDeleteVocab(word.id)}><Delete /></IconButton>
                 </div>
-              ) : (
-                <div style={{ flex: 1 }}>
-                  <strong>{word.word}</strong> → {word.translation}
-                  <br />
-                  <small>{word.description}</small>
-                  <br />
-                  <em>Category: {word.category || "None"}</em>
-                </div>
-              )}
-              <button onClick={() => startEditing(word)}>✏️</button>
-              <button onClick={() => handleDeleteVocab(word.id)}>🗑️</button>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
-    </div>
+      </Container>
   );
 }
