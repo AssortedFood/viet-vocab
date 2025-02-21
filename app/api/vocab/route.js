@@ -1,6 +1,6 @@
 // app/api/vocab/route.js
 "use server";
-import { getAllVocab, addVocab, deleteVocab, updateFamiliarity, editVocab } from "@/lib/vocab";
+import { getAllVocab, addVocab, deleteVocab, updateFamiliarity, editVocab } from "../../../lib/vocab";
 
 // Handle GET request - Fetch vocab list
 export async function GET(req) {
