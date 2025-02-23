@@ -21,6 +21,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" style={{ height: "100%" }}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#3D3A4B" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable}`}
         style={{
@@ -33,9 +37,7 @@ export default function RootLayout({ children }) {
           justifyContent: "center",
         }}
       >
-        <AppThemeProvider>
-          {children}
-        </AppThemeProvider>
+        <AppThemeProvider>{children}</AppThemeProvider>
       </body>
     </html>
   );

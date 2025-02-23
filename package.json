@@ -16,6 +16,7 @@
     "@mui/material": "^6.4.5",
     "dotenv": "^16.4.7",
     "next": "15.1.7",
+    "next-pwa": "^5.6.0",
     "openai": "^4.85.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
