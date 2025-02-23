@@ -1,4 +1,5 @@
 // app/layout.js
+import SWRegister from "./sw-register"; // ✅ Import Service Worker Registration
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppThemeProvider from "./theme-provider";
@@ -29,7 +30,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable}`}
         style={{
           margin: 0,
-          height: "100vh", // Ensure full viewport height
+          height: "100vh",
           width: "100vw",
           display: "flex",
           flexDirection: "column",
@@ -37,6 +38,7 @@ export default function RootLayout({ children }) {
           justifyContent: "center",
         }}
       >
+        <SWRegister /> {/* ✅ Registers Service Worker */}
         <AppThemeProvider>{children}</AppThemeProvider>
       </body>
     </html>
