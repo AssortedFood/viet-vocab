@@ -121,7 +121,7 @@ export default function VocabPage() {
       }}
     >
 
-      {/* Toggle Add Word Form Button */}
+      {/* Toggle Add Vocab Form Button */}
       <Button 
         variant="contained" 
         startIcon={<Add />} 
@@ -129,17 +129,17 @@ export default function VocabPage() {
         onClick={() => setShowAddWord(!showAddWord)} 
         sx={{ marginBottom: "10px", bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}
       >
-        {showAddWord ? "Close" : "Add New Word"}
+        {showAddWord ? "Close" : "Add New Vocab"}
       </Button>
 
-      {/* Add New Word Section */}
+      {/* Add New Vocab Section */}
       {showAddWord && (
         <div style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "20px" }}>
           <TextField fullWidth label="Vietnamese" value={newWord.word} onChange={(e) => setNewWord({ ...newWord, word: e.target.value })} sx={{ marginBottom: "10px" }} />
           <TextField fullWidth label="English Translation" value={newWord.translation} onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })} sx={{ marginBottom: "10px" }} />
           <Button variant="contained" color="success" fullWidth onClick={handleAddVocab} 
         sx={{ marginBottom: "10px", bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}>
-            Add Word
+            Add Vocab
           </Button>
         </div>
       )}
