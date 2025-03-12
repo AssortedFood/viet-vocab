@@ -182,6 +182,20 @@ export default function VocabPage() {
                   onChange={(e) => handleEditChange("translation", e.target.value)}
                   sx={{ marginBottom: "5px" }}
                 />
+                <TextField
+                  fullWidth
+                  label="Description"
+                  value={editingWord.description}
+                  onChange={(e) => handleEditChange("description", e.target.value)}
+                  sx={{ marginBottom: "5px" }}
+                />
+                <TextField
+                  fullWidth
+                  label="Category"
+                  value={editingWord.category}
+                  onChange={(e) => handleEditChange("category", e.target.value)}
+                  sx={{ marginBottom: "5px" }}
+                />
                 <div style={{ display: "flex", gap: "10px", marginTop: "5px" }}>
                   <Button
                     variant="contained"
