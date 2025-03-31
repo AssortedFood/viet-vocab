@@ -32,13 +32,21 @@ export default function VocabPage() {
   }, [sortBy, categoryFilter]);
 
   // Helper to play audio data stored as a Blob or Buffer.
-  const playAudio = (audioData) => {
-    if (!audioData) return;
-    // Create a Blob from the binary data
-    const blob = new Blob([audioData], { type: "audio/mpeg" });
-    const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.play();
+  const playAudio = async (id, type) => {
+    try {
+      const response = await fetch(`/api/audio?id=${id}&type=${type}`);
+      if (!response.ok) {
+        console.error("Failed to fetch audio:", response.statusText);
+        return;
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const blob = new Blob([arrayBuffer], { type: "audio/mpeg" });
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audio.play();
+    } catch (error) {
+      console.error("Error playing audio:", error);
+    }
   };
 
   // Fetch vocab from API
@@ -255,7 +263,7 @@ export default function VocabPage() {
                   {word.word} → {word.translation}
                   <IconButton
                     size="small"
-                    onClick={() => playAudio(word.word_audio)}
+                    onClick={() => playAudio(word.id, "word_audio")}
                     sx={{ marginLeft: 0.5 }}
                   >
                     <VolumeUp fontSize="small" />
@@ -265,7 +273,7 @@ export default function VocabPage() {
                   {word.description}
                   <IconButton
                     size="small"
-                    onClick={() => playAudio(word.description_audio)}
+                    onClick={() => playAudio(word.id, "description_audio")}
                     sx={{ marginLeft: 0.5 }}
                   >
                     <VolumeUp fontSize="small" />
