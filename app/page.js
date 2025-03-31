@@ -1,15 +1,29 @@
 // app/vocab/page.js
 "use client";
 import { useState, useEffect } from "react";
-import { Container, TextField, Button, Select, MenuItem, Card, CardContent, Typography, IconButton, CircularProgress } from "@mui/material";
-import { Add, Edit, Delete } from "@mui/icons-material";
+import {
+  Container,
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  IconButton,
+  CircularProgress
+} from "@mui/material";
+import { Add, Edit, Delete, VolumeUp } from "@mui/icons-material";
 
 export default function VocabPage() {
   const [vocabList, setVocabList] = useState(null); // Ensures SSR & Client match
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState("createdAt");
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [newWord, setNewWord] = useState({ word: "", translation: "", description: "", category: "" });
+  const [newWord, setNewWord] = useState({
+    word: "",
+    translation: "",
+    description: "",
+    category: ""
+  });
   const [showAddWord, setShowAddWord] = useState(false);
   const [editingWord, setEditingWord] = useState(null); // Track editing state
 
@@ -17,11 +31,23 @@ export default function VocabPage() {
     loadVocab();
   }, [sortBy, categoryFilter]);
 
+  // Helper to play audio data stored as a Blob or Buffer.
+  const playAudio = (audioData) => {
+    if (!audioData) return;
+    // Create a Blob from the binary data
+    const blob = new Blob([audioData], { type: "audio/mpeg" });
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.play();
+  };
+
   // Fetch vocab from API
   const loadVocab = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/vocab?sortBy=${sortBy}&category=${encodeURIComponent(categoryFilter)}`);
+      const res = await fetch(
+        `/api/vocab?sortBy=${sortBy}&category=${encodeURIComponent(categoryFilter)}`
+      );
       const data = await res.json();
       setVocabList(data);
     } catch (error) {
@@ -33,14 +59,12 @@ export default function VocabPage() {
   // Add new vocab via API
   const handleAddVocab = async () => {
     if (!newWord.word || !newWord.translation) return;
-
     try {
       await fetch("/api/vocab", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newWord),
+        body: JSON.stringify(newWord)
       });
-
       setNewWord({ word: "", translation: "", description: "", category: "" });
       setShowAddWord(false); // Close form after adding
       loadVocab(); // Refresh vocab list
@@ -65,9 +89,8 @@ export default function VocabPage() {
       await fetch("/api/vocab", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, score }),
+        body: JSON.stringify({ id, score })
       });
-
       setVocabList((prevList) =>
         prevList.map((word) => (word.id === id ? { ...word, familiarity: score } : word))
       );
@@ -89,45 +112,44 @@ export default function VocabPage() {
   // Save edited vocab entry via API
   const handleEditSave = async (id) => {
     if (!editingWord.word || !editingWord.translation) return;
-  
     try {
       const res = await fetch("/api/vocab", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, ...editingWord }),
+        body: JSON.stringify({ id, ...editingWord })
       });
-  
       if (!res.ok) {
         const errorData = await res.json();
         console.error("❌ Edit Error:", errorData);
         return;
       }
-  
       setEditingWord(null); // Exit editing mode
       loadVocab(); // Refresh list to reflect changes
     } catch (error) {
       console.error("❌ Error updating vocab:", error);
     }
   };
-  
 
   return (
     <Container
-      sx={{ 
-        padding: "20px", 
-        backgroundColor: "background.default", 
+      sx={{
+        padding: "20px",
+        backgroundColor: "background.default",
         minHeight: "100vh", // Ensures it fills the screen
-        overflowY: "auto", // Allows scrolling when expanded
+        overflowY: "auto" // Allows scrolling when expanded
       }}
     >
-
       {/* Toggle Add Vocab Form Button */}
-      <Button 
-        variant="contained" 
-        startIcon={<Add />} 
-        fullWidth 
-        onClick={() => setShowAddWord(!showAddWord)} 
-        sx={{ marginBottom: "10px", bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}
+      <Button
+        variant="contained"
+        startIcon={<Add />}
+        fullWidth
+        onClick={() => setShowAddWord(!showAddWord)}
+        sx={{
+          marginBottom: "10px",
+          bgcolor: "primary.main",
+          "&:hover": { bgcolor: "primary.dark" }
+        }}
       >
         {showAddWord ? "Close" : "Add New Vocab"}
       </Button>
@@ -135,21 +157,42 @@ export default function VocabPage() {
       {/* Add New Vocab Section */}
       {showAddWord && (
         <div style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "20px" }}>
-          <TextField fullWidth label="Vietnamese" value={newWord.word} onChange={(e) => setNewWord({ ...newWord, word: e.target.value })} sx={{ marginBottom: "10px" }} />
-          <TextField fullWidth label="English Translation" value={newWord.translation} onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })} sx={{ marginBottom: "10px" }} />
-          <Button variant="contained" color="success" fullWidth onClick={handleAddVocab} 
-        sx={{ marginBottom: "10px", bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}>
+          <TextField
+            fullWidth
+            label="Vietnamese"
+            value={newWord.word}
+            onChange={(e) => setNewWord({ ...newWord, word: e.target.value })}
+            sx={{ marginBottom: "10px" }}
+          />
+          <TextField
+            fullWidth
+            label="English Translation"
+            value={newWord.translation}
+            onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })}
+            sx={{ marginBottom: "10px" }}
+          />
+          <Button
+            variant="contained"
+            color="success"
+            fullWidth
+            onClick={handleAddVocab}
+            sx={{
+              marginBottom: "10px",
+              bgcolor: "primary.main",
+              "&:hover": { bgcolor: "primary.dark" }
+            }}
+          >
             Add Vocab
           </Button>
         </div>
       )}
 
       {/* Category Filter - Full Width */}
-      <TextField 
-        fullWidth 
-        label="Filter by Category" 
-        value={categoryFilter} 
-        onChange={(e) => setCategoryFilter(e.target.value)} 
+      <TextField
+        fullWidth
+        label="Filter by Category"
+        value={categoryFilter}
+        onChange={(e) => setCategoryFilter(e.target.value)}
         variant="outlined"
         sx={{ bgcolor: "background.paper", borderRadius: "5px", marginBottom: "10px" }}
       />
@@ -197,38 +240,53 @@ export default function VocabPage() {
                   sx={{ marginBottom: "5px" }}
                 />
                 <div style={{ display: "flex", gap: "10px", marginTop: "5px" }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleEditSave(word.id)}
-                  >
+                  <Button variant="contained" color="primary" onClick={() => handleEditSave(word.id)}>
                     Save
                   </Button>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => setEditingWord(null)} // Cancels editing
-                  >
+                  <Button variant="outlined" color="secondary" onClick={() => setEditingWord(null)}>
                     Cancel
                   </Button>
                 </div>
-
               </>
             ) : (
-              // Otherwise, show normal text
+              // Display mode: show text and audio buttons inline after the text
               <>
-                <Typography variant="h6">{word.word} → {word.translation}</Typography>
-                <Typography variant="body2" color="textSecondary">{word.description}</Typography>
-                <Typography variant="caption">Category: {word.category || "None"}</Typography>
+                <Typography variant="h6">
+                  {word.word} → {word.translation}
+                  <IconButton
+                    size="small"
+                    onClick={() => playAudio(word.word_audio)}
+                    sx={{ marginLeft: 0.5 }}
+                  >
+                    <VolumeUp fontSize="small" />
+                  </IconButton>
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {word.description}
+                  <IconButton
+                    size="small"
+                    onClick={() => playAudio(word.description_audio)}
+                    sx={{ marginLeft: 0.5 }}
+                  >
+                    <VolumeUp fontSize="small" />
+                  </IconButton>
+                </Typography>
+                <Typography variant="caption">
+                  Category: {word.category || "None"}
+                </Typography>
                 <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
-                  <IconButton color="primary" onClick={() => startEditing(word)}><Edit /></IconButton>
-                  <IconButton color="secondary" onClick={() => handleDeleteVocab(word.id)}><Delete /></IconButton>
+                  <IconButton color="primary" onClick={() => startEditing(word)}>
+                    <Edit />
+                  </IconButton>
+                  <IconButton color="secondary" onClick={() => handleDeleteVocab(word.id)}>
+                    <Delete />
+                  </IconButton>
                 </div>
               </>
             )}
           </CardContent>
         </Card>
       ))}
-      </Container>
+    </Container>
   );
 }
