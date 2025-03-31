@@ -3,6 +3,8 @@
 .
 ├── app
 │   ├── api
+│   │   ├── speech
+│   │   │   └── route.js
 │   │   └── vocab
 │   │       └── route.js
 │   ├── globals.css
@@ -17,9 +19,11 @@
 ├── Dockerfile
 ├── lib
 │   ├── db.js
+│   ├── elevenlabs.js
 │   ├── gpt.js
 │   └── vocab.js
 ├── next.config.mjs
+├── output.mp3
 ├── output.txt
 ├── package.json
 ├── public
@@ -32,9 +36,85 @@
 │   ├── sw.js
 │   └── workbox-4754cb34.js
 ├── README.md
+├── testTTS.js
 └── TODO.md
 
-8 directories, 25 files
+9 directories, 29 files
+
+
+
+📄 FILE: ./testTTS.js
+──────────────────────────────
+// testApiTTS.js
+import fetch from "node-fetch"; // If using Node 18+, you can use the global fetch.
+import { writeFile } from "fs/promises";
+
+(async () => {
+  try {
+    const response = await fetch("http://localhost:3002/api/speech", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: "Xin chào, đây là một thử nghiệm" }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API call failed: ${response.status} ${response.statusText}`);
+    }
+
+    // Read the response as an array buffer and convert it to a Node Buffer
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = Buffer.from(arrayBuffer);
+
+    // Save the buffer to an audio file
+    await writeFile("output.mp3", audioBuffer);
+    console.log("Audio file saved as output.mp3");
+  } catch (error) {
+    console.error("Error during API test:", error);
+  }
+})();
+
+
+
+📄 FILE: ./README.md
+──────────────────────────────
+# 📖 Viet Vocab App
+
+A simple vocabulary learning app built with **Next.js (App Router)** and **SQLite**, designed to help learners improve their Vietnamese.
+
+## Features
+- **Add and View Vocabulary**: Enter words in Vietnamese with English translations and categories.
+- **Automated Corrections**: New words are **automatically corrected** using AI to fix Vietnamese accents and suggest appropriate categories.
+- **Infinite Scroll**: Seamlessly browse the vocabulary list.
+- **Sorting & Filtering**: Sort by **date added, familiarity level, or category**. Filter words by category for focused learning.
+- **Quiz Mode**: Self-score familiarity using three levels (😟 | 😐 | 🙂).
+- **SQLite Direct Access**: No ORM—efficient and simple database management.
+
+## Tech Stack
+- **Next.js (App Router)**
+- **SQLite (Direct Queries)**
+- **OpenAI GPT** (for automatic vocabulary correction)
+
+## Setup
+```sh
+git clone https://github.com/AssortedFood/viet-vocab.git
+cd viet-vocab
+npm install
+npm run dev
+```
+
+## Self-Hosting Notes
+- SQLite database (`vocab.db`) is stored in the `data/` directory.
+- Ensure `OPENAI_API_KEY` is set in your environment for AI corrections.
+
+📚 **Happy Learning!**
+
+
+📄 FILE: ./TODO.md
+──────────────────────────────
+# TODO
+
+- modify search categories to be a generic search that searches viet terms with fuzzy matching of accents, english words, and categories.
+- look into adding pronounciations
 
 
 
@@ -180,6 +260,31 @@ export async function PATCH(req) {
       return Response.json({ error: "Failed to edit vocab" }, { status: 500 });
     }
   }
+
+
+📄 FILE: ./app/api/speech/route.js
+──────────────────────────────
+// app/api/speech/route.js
+"use server";
+import { textToSpeech } from "../../../lib/elevenlabs";
+
+export async function POST(req) {
+  try {
+    const { text } = await req.json();
+    if (!text) {
+      return new Response("Missing text parameter.", { status: 400 });
+    }
+    const audioBuffer = await textToSpeech(text);
+    return new Response(audioBuffer, {
+      status: 200,
+      headers: { "Content-Type": "audio/mpeg" },
+    });
+  } catch (error) {
+    console.error("Error in ElevenLabs API endpoint:", error);
+    return new Response("Failed to convert text to speech.", { status: 500 });
+  }
+}
+
 
 
 📄 FILE: ./app/sw-register.js
@@ -455,6 +560,20 @@ export default function VocabPage() {
                   onChange={(e) => handleEditChange("translation", e.target.value)}
                   sx={{ marginBottom: "5px" }}
                 />
+                <TextField
+                  fullWidth
+                  label="Description"
+                  value={editingWord.description}
+                  onChange={(e) => handleEditChange("description", e.target.value)}
+                  sx={{ marginBottom: "5px" }}
+                />
+                <TextField
+                  fullWidth
+                  label="Category"
+                  value={editingWord.category}
+                  onChange={(e) => handleEditChange("category", e.target.value)}
+                  sx={{ marginBottom: "5px" }}
+                />
                 <div style={{ display: "flex", gap: "10px", marginTop: "5px" }}>
                   <Button
                     variant="contained"
@@ -502,7 +621,7 @@ define(["exports"],(function(t){"use strict";try{self["workbox:core:6.5.4"]&&_()
 
 📄 FILE: ./public/sw.js
 ──────────────────────────────
-if(!self.define){let e,s={};const n=(n,a)=>(n=new URL(n+".js",a).href,s[n]||new Promise((s=>{if("document"in self){const e=document.createElement("script");e.src=n,e.onload=s,document.head.appendChild(e)}else e=n,importScripts(n),s()})).then((()=>{let e=s[n];if(!e)throw new Error(`Module ${n} didn’t register its module`);return e})));self.define=(a,t)=>{const i=e||("document"in self?document.currentScript.src:"")||location.href;if(s[i])return;let c={};const r=e=>n(e,i),o={module:{uri:i},exports:c,require:r};s[i]=Promise.all(a.map((e=>o[e]||r(e)))).then((e=>(t(...e),c)))}}define(["./workbox-4754cb34"],(function(e){"use strict";importScripts(),self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/_next/app-build-manifest.json",revision:"227bcf573e48f7ffacb471c784fe9a7a"},{url:"/_next/static/chunks/130-7ac7571d3bdb068c.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/189-76426ddf98383567.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/4bd1b696-1c20c52a7d48565d.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/517-85a5eb33b20df93d.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/818-a8291c839efaaf62.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/app/_not-found/page-cf561b08769316e0.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/app/api/vocab/route-402c9782c00e9622.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/app/layout-0e9d4dec6e2afc77.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/app/page-b9374a2a15df757d.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/framework-6b27c2b7aa38af2d.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/main-app-1ce5408570ef6d82.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/main-dbafd64bd50ed2f6.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/pages/_app-d23763e3e6c904ff.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/pages/_error-9b7125ad1a1e68fa.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/chunks/polyfills-42372ed130431b0a.js",revision:"846118c33b2c0e922d7b3a7676f81f6f"},{url:"/_next/static/chunks/webpack-591e0eb94decce02.js",revision:"dPUmhyHeX6VrosEWKHK7-"},{url:"/_next/static/css/735d15465953feb4.css",revision:"735d15465953feb4"},{url:"/_next/static/dPUmhyHeX6VrosEWKHK7-/_buildManifest.js",revision:"8c347785c953bc9aca247cd961fe14ca"},{url:"/_next/static/dPUmhyHeX6VrosEWKHK7-/_ssgManifest.js",revision:"b6652df95db52feb4daf4eca35380933"},{url:"/_next/static/media/569ce4b8f30dc480-s.p.woff2",revision:"ef6cefb32024deac234e82f932a95cbd"},{url:"/_next/static/media/747892c23ea88013-s.woff2",revision:"a0761690ccf4441ace5cec893b82d4ab"},{url:"/_next/static/media/93f479601ee12b01-s.p.woff2",revision:"da83d5f06d825c5ae65b7cca706cb312"},{url:"/_next/static/media/ba015fad6dcf6784-s.woff2",revision:"8ea4f719af3312a055caf09f34c89a77"},{url:"/favicon.ico",revision:"ce1ec9b049b2b75841ecb2722afc7a03"},{url:"/icons/icon-192.png",revision:"b8db8689a36a6933b7beddfdd44650ba"},{url:"/icons/icon-512.png",revision:"43dbfa0b47bcfc5ccab01f06473ace02"},{url:"/manifest.json",revision:"73a928fcad0c584e8c6b21ab3f4d5d4b"},{url:"/service-worker.js",revision:"a6a9123958ffd9af6cd2e83073394aa3"}],{ignoreURLParametersMatching:[]}),e.cleanupOutdatedCaches(),e.registerRoute("/",new e.NetworkFirst({cacheName:"start-url",plugins:[{cacheWillUpdate:async({request:e,response:s,event:n,state:a})=>s&&"opaqueredirect"===s.type?new Response(s.body,{status:200,statusText:"OK",headers:s.headers}):s}]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts-webfonts",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:31536e3})]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:googleapis)\.com\/.*/i,new e.StaleWhileRevalidate({cacheName:"google-fonts-stylesheets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,new e.StaleWhileRevalidate({cacheName:"static-font-assets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,new e.StaleWhileRevalidate({cacheName:"static-image-assets",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/image\?url=.+$/i,new e.StaleWhileRevalidate({cacheName:"next-image",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp3|wav|ogg)$/i,new e.CacheFirst({cacheName:"static-audio-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp4)$/i,new e.CacheFirst({cacheName:"static-video-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:js)$/i,new e.StaleWhileRevalidate({cacheName:"static-js-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:css|less)$/i,new e.StaleWhileRevalidate({cacheName:"static-style-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/data\/.+\/.+\.json$/i,new e.StaleWhileRevalidate({cacheName:"next-data",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:json|xml|csv)$/i,new e.NetworkFirst({cacheName:"static-data-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute((({url:e})=>{if(!(self.origin===e.origin))return!1;const s=e.pathname;return!s.startsWith("/api/auth/")&&!!s.startsWith("/api/")}),new e.NetworkFirst({cacheName:"apis",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:16,maxAgeSeconds:86400})]}),"GET"),e.registerRoute((({url:e})=>{if(!(self.origin===e.origin))return!1;return!e.pathname.startsWith("/api/")}),new e.NetworkFirst({cacheName:"others",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute((({url:e})=>!(self.origin===e.origin)),new e.NetworkFirst({cacheName:"cross-origin",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:3600})]}),"GET")}));
+if(!self.define){let e,s={};const n=(n,i)=>(n=new URL(n+".js",i).href,s[n]||new Promise((s=>{if("document"in self){const e=document.createElement("script");e.src=n,e.onload=s,document.head.appendChild(e)}else e=n,importScripts(n),s()})).then((()=>{let e=s[n];if(!e)throw new Error(`Module ${n} didn’t register its module`);return e})));self.define=(i,a)=>{const t=e||("document"in self?document.currentScript.src:"")||location.href;if(s[t])return;let c={};const r=e=>n(e,t),o={module:{uri:t},exports:c,require:r};s[t]=Promise.all(i.map((e=>o[e]||r(e)))).then((e=>(a(...e),c)))}}define(["./workbox-4754cb34"],(function(e){"use strict";importScripts(),self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/_next/app-build-manifest.json",revision:"e97842c17c501c895d44b54a9e361cd0"},{url:"/_next/static/DO4gRfCVqRiq5qqZSW-qQ/_buildManifest.js",revision:"8c347785c953bc9aca247cd961fe14ca"},{url:"/_next/static/DO4gRfCVqRiq5qqZSW-qQ/_ssgManifest.js",revision:"b6652df95db52feb4daf4eca35380933"},{url:"/_next/static/chunks/130-7ac7571d3bdb068c.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/189-76426ddf98383567.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/4bd1b696-1c20c52a7d48565d.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/517-85a5eb33b20df93d.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/818-a8291c839efaaf62.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/app/_not-found/page-cf561b08769316e0.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/app/api/vocab/route-402c9782c00e9622.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/app/layout-0e9d4dec6e2afc77.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/app/page-97d3de8fea91a5c1.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/framework-6b27c2b7aa38af2d.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/main-app-1ce5408570ef6d82.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/main-dbafd64bd50ed2f6.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/pages/_app-d23763e3e6c904ff.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/pages/_error-9b7125ad1a1e68fa.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/chunks/polyfills-42372ed130431b0a.js",revision:"846118c33b2c0e922d7b3a7676f81f6f"},{url:"/_next/static/chunks/webpack-591e0eb94decce02.js",revision:"DO4gRfCVqRiq5qqZSW-qQ"},{url:"/_next/static/css/735d15465953feb4.css",revision:"735d15465953feb4"},{url:"/_next/static/media/569ce4b8f30dc480-s.p.woff2",revision:"ef6cefb32024deac234e82f932a95cbd"},{url:"/_next/static/media/747892c23ea88013-s.woff2",revision:"a0761690ccf4441ace5cec893b82d4ab"},{url:"/_next/static/media/93f479601ee12b01-s.p.woff2",revision:"da83d5f06d825c5ae65b7cca706cb312"},{url:"/_next/static/media/ba015fad6dcf6784-s.woff2",revision:"8ea4f719af3312a055caf09f34c89a77"},{url:"/favicon.ico",revision:"ce1ec9b049b2b75841ecb2722afc7a03"},{url:"/icons/icon-192.png",revision:"b8db8689a36a6933b7beddfdd44650ba"},{url:"/icons/icon-512.png",revision:"43dbfa0b47bcfc5ccab01f06473ace02"},{url:"/manifest.json",revision:"73a928fcad0c584e8c6b21ab3f4d5d4b"},{url:"/service-worker.js",revision:"a6a9123958ffd9af6cd2e83073394aa3"}],{ignoreURLParametersMatching:[]}),e.cleanupOutdatedCaches(),e.registerRoute("/",new e.NetworkFirst({cacheName:"start-url",plugins:[{cacheWillUpdate:async({request:e,response:s,event:n,state:i})=>s&&"opaqueredirect"===s.type?new Response(s.body,{status:200,statusText:"OK",headers:s.headers}):s}]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts-webfonts",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:31536e3})]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:googleapis)\.com\/.*/i,new e.StaleWhileRevalidate({cacheName:"google-fonts-stylesheets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,new e.StaleWhileRevalidate({cacheName:"static-font-assets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,new e.StaleWhileRevalidate({cacheName:"static-image-assets",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/image\?url=.+$/i,new e.StaleWhileRevalidate({cacheName:"next-image",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp3|wav|ogg)$/i,new e.CacheFirst({cacheName:"static-audio-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp4)$/i,new e.CacheFirst({cacheName:"static-video-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:js)$/i,new e.StaleWhileRevalidate({cacheName:"static-js-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:css|less)$/i,new e.StaleWhileRevalidate({cacheName:"static-style-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/data\/.+\/.+\.json$/i,new e.StaleWhileRevalidate({cacheName:"next-data",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:json|xml|csv)$/i,new e.NetworkFirst({cacheName:"static-data-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute((({url:e})=>{if(!(self.origin===e.origin))return!1;const s=e.pathname;return!s.startsWith("/api/auth/")&&!!s.startsWith("/api/")}),new e.NetworkFirst({cacheName:"apis",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:16,maxAgeSeconds:86400})]}),"GET"),e.registerRoute((({url:e})=>{if(!(self.origin===e.origin))return!1;return!e.pathname.startsWith("/api/")}),new e.NetworkFirst({cacheName:"others",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute((({url:e})=>!(self.origin===e.origin)),new e.NetworkFirst({cacheName:"cross-origin",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:3600})]}),"GET")}));
 
 
 
@@ -542,6 +661,63 @@ const dbPromise = open({
 // Function to get database instance
 export async function getDB() {
   return dbPromise;
+}
+
+
+
+📄 FILE: ./lib/elevenlabs.js
+──────────────────────────────
+// lib/elevenlabs.js
+import { ElevenLabsClient } from "elevenlabs";
+
+const client = new ElevenLabsClient({
+  apiKey: process.env.ELEVENLABS_API_KEY,
+});
+
+/**
+ * Converts text to speech using ElevenLabs and returns audio data as a Buffer.
+ *
+ * @param {string} text - The text to convert.
+ * @returns {Promise<Buffer>} - The binary audio data.
+ */
+export async function textToSpeech(text) {
+  try {
+    console.log("Sending text to ElevenLabs:", text);
+    const result = await client.textToSpeech.convert("JBFqnCBsd6RMkjVDRZzb", {
+      output_format: "mp3_44100_128",
+      text,
+      model_id: "eleven_flash_v2_5",
+      language_code: "vi",
+    });
+
+    if (result.readableStream) {
+      console.log("Received a stream from ElevenLabs.");
+      // Manually consume the stream:
+      const reader = result.readableStream.getReader();
+      const buffers = [];
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffers.push(Buffer.from(value));
+      }
+      const audioBuffer = Buffer.concat(buffers);
+      console.log("Converted stream to Buffer, length:", audioBuffer.length);
+      return audioBuffer;
+    } else if (typeof result === "string") {
+      console.log("Received blob URL:", result);
+      const response = await fetch(result);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch audio data: ${response.statusText}`);
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      return Buffer.from(arrayBuffer);
+    } else {
+      throw new Error("Unexpected type returned from ElevenLabs.");
+    }
+  } catch (error) {
+    console.error("ElevenLabs conversion error:", error);
+    throw error;
+  }
 }
 
 
@@ -776,5 +952,21 @@ export async function getCategories() {
 
   return result.map(row => row.category);
 }
+
+
+📄 FILE: ./data/schema.sql
+──────────────────────────────
+CREATE TABLE IF NOT EXISTS vocab (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    word TEXT NOT NULL,
+    translation TEXT NOT NULL,
+    description TEXT,
+    category TEXT DEFAULT '',
+    familiarity INTEGER DEFAULT 0,  -- 0 = Not rated, 1 = 😟, 2 = 😐, 3 = 🙂
+    word_audio BLOB,
+    description_audio BLOB,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 
