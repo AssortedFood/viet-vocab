@@ -1,4 +1,3 @@
-// app/api/vocab/route.js
 "use server";
 import { getAllVocab, addVocab, deleteVocab, updateFamiliarity, editVocab } from "../../../lib/vocab";
 
@@ -7,8 +6,10 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const sortBy = searchParams.get("sortBy") || "createdAt";
-    const category = searchParams.get("category") || null;
-    const vocab = await getAllVocab({ sortBy, category });
+    
+    // ✅ Updated to use generic search query instead of category
+    const search = searchParams.get("search") || null;
+    const vocab = await getAllVocab({ sortBy, search });
 
     return Response.json(vocab, { status: 200 });
   } catch (error) {
@@ -71,19 +72,19 @@ export async function PUT(req) {
 
 // Handle PATCH request - Edit vocab entry
 export async function PATCH(req) {
-    try {
-      const { id, word, translation, description = "", category = "" } = await req.json();
-  
-      console.log("🔍 PATCH Request Data:", { id, word, translation, description, category });
-  
-      if (!id || !word || !translation) {
-        return Response.json({ error: "ID, word, and translation are required." }, { status: 400 });
-      }
-  
-      await editVocab(id, word, translation, description, category);
-      return Response.json({ success: true, updatedID: id }, { status: 200 });
-    } catch (error) {
-      console.error("❌ Error editing vocab:", error);
-      return Response.json({ error: "Failed to edit vocab" }, { status: 500 });
+  try {
+    const { id, word, translation, description = "", category = "" } = await req.json();
+
+    console.log("🔍 PATCH Request Data:", { id, word, translation, description, category });
+
+    if (!id || !word || !translation) {
+      return Response.json({ error: "ID, word, and translation are required." }, { status: 400 });
     }
+
+    await editVocab(id, word, translation, description, category);
+    return Response.json({ success: true, updatedID: id }, { status: 200 });
+  } catch (error) {
+    console.error("❌ Error editing vocab:", error);
+    return Response.json({ error: "Failed to edit vocab" }, { status: 500 });
   }
+}
