@@ -22,7 +22,7 @@ export default function AddVocabForm({ newWord, setNewWord, handleAddVocab }) {
         color="success"
         fullWidth
         onClick={handleAddVocab}
-        sx={{ marginBottom: "10px" }}
+        sx={{ mb: 2, bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}
       >
         Add Vocab
       </Button>
