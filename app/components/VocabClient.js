@@ -68,7 +68,7 @@ export default function VocabClient() {
   }
 
   async function handleAddVocab() {
-    if (!newWord.word || !newWord.translation) return;
+    if (!newWord.word && !newWord.translation) return;
     try {
       await fetch("/api/vocab", {
         method: "POST",

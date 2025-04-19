@@ -22,9 +22,9 @@ export async function GET(req) {
 export async function POST(req) {
   try {
     const { word, translation, description = "", category = "" } = await req.json();
-    
-    if (!word || !translation) {
-      return Response.json({ error: "Word and translation are required." }, { status: 400 });
+
+    if (!word && !translation) {
+      return Response.json({ error: "Either word or translation is required." }, { status: 400 });
     }
 
     const result = await addVocab(word, translation, description, category);
