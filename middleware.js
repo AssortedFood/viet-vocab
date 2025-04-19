@@ -1,17 +1,18 @@
 // middleware.js
-import { withAuth } from "next-auth/middleware";
+import { withAuth } from "next-auth/middleware"
 
 export default withAuth({
-  pages: { signIn: "/auth/signin" },
-});
+  callbacks: {
+    // allow any authenticated session
+    authorized: ({ token }) => !!token,
+  },
+  pages: {
+    signIn: "/auth/signin",
+  },
+})
 
 export const config = {
   matcher: [
-    /*
-      protect everything except:
-      - next-auth’s own API routes
-      - Next.js internals and static files
-    */
-    "/((?!api/auth|_next/static|_next/image|favicon.ico).*)",
+    "/((?!_next/static|_next/image|favicon\\.ico|manifest\\.json|icons|service-worker\\.js|api/auth|auth/signin).*)",
   ],
-};
+}
