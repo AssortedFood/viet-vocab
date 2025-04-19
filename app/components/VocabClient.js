@@ -46,7 +46,7 @@ export default function VocabClient() {
   async function fetchAllVocab() {
     setLoading(true);
     try {
-      const res = await fetch("/api/vocab/all?includeAudio=false");
+      const res = await globalThis.fetch("/api/vocab/all?includeAudio=false");
       const data = await res.json();
       setAllVocab(data);
     } catch (err) {
@@ -57,7 +57,7 @@ export default function VocabClient() {
 
   async function playAudio(id, type) {
     try {
-      const res = await fetch(`/api/audio?id=${id}&type=${type}`);
+      const res = await globalThis.fetch(`/api/audio?id=${id}&type=${type}`);
       if (!res.ok) throw new Error("Audio fetch failed");
       const buffer = await res.arrayBuffer();
       const url = URL.createObjectURL(new Blob([buffer], { type: "audio/mpeg" }));
@@ -70,7 +70,7 @@ export default function VocabClient() {
   async function handleAddVocab() {
     if (!newWord.word && !newWord.translation) return;
     try {
-      await fetch("/api/vocab", {
+      await globalThis.fetch("/api/vocab", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newWord),
@@ -85,7 +85,7 @@ export default function VocabClient() {
 
   async function handleDeleteVocab(id) {
     try {
-      await fetch(`/api/vocab?id=${id}`, { method: "DELETE" });
+      await globalThis.fetch(`/api/vocab?id=${id}`, { method: "DELETE" });
       fetchAllVocab();
     } catch (err) {
       console.error("Error deleting vocab:", err);
@@ -104,7 +104,7 @@ export default function VocabClient() {
   async function handleEditSave(id) {
     if (!editingWord.word || !editingWord.translation) return;
     try {
-      const res = await fetch("/api/vocab", {
+      const res = await globalThis.fetch("/api/vocab", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, ...editingWord }),
