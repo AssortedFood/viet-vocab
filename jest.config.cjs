@@ -1,17 +1,43 @@
 // jest.config.cjs
 module.exports = {
-  roots: ['<rootDir>/tests'],
-  testEnvironment: 'jest-environment-jsdom',
+  roots: ["<rootDir>/tests"],
+  testEnvironment: "jest-environment-jsdom",
+
   // Polyfill fetch for OpenAI
-  setupFiles: ['openai/shims/node'],
-  // Then any additional setup
-  setupFilesAfterEnv: ['<rootDir>/tests/testSetup.js'],
+  setupFiles: ["openai/shims/node"],
+  setupFilesAfterEnv: ["<rootDir>/tests/testSetup.js"],
+
+  // Stub out static assets
   moduleNameMapper: {
-    '\\.(css|png|jpg|jpeg|gif|svg)$': 'identity-obj-proxy'
+    "\\.(css|png|jpe?g|gif|svg)$": "identity-obj-proxy"
   },
+
+  // Use SWC to transform everything, with JSX support
   transform: {
-    // Use babel-jest to transform JS/JSX/TS/TSX
-    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest'
+    "^.+\\.(js|jsx|ts|tsx)$": [
+      "@swc/jest",
+      {
+        jsc: {
+          parser: {
+            syntax: "ecmascript",
+            jsx: true,
+            dynamicImport: true
+          },
+          transform: {
+            react: {
+              runtime: "automatic",
+              development: process.env.NODE_ENV !== "production",
+              useBuiltins: true
+            }
+          }
+        },
+        module: {
+          type: "commonjs"
+        }
+      }
+    ]
   },
-  moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
+
+  transformIgnorePatterns: ["/node_modules/"],
+  moduleFileExtensions: ["js", "jsx", "ts", "tsx", "json"],
 };
