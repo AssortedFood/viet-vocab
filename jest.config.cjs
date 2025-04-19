@@ -1,16 +1,16 @@
 // jest.config.cjs
 module.exports = {
-    roots: ['<rootDir>/tests'],
-    testEnvironment: 'jsdom',
-    setupFilesAfterEnv: ['<rootDir>/tests/testSetup.js'],
-    moduleNameMapper: {
-      // Mock static asset imports
-      '\\.(css|png|jpg|jpeg|gif|svg)$': 'identity-obj-proxy'
-    },
-    transform: {
-      // Handle JS/JSX/TS/TSX via babel-jest
-      '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest'
-    },
-    moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
-  };
-  
+  roots: ['<rootDir>/tests'],
+  testEnvironment: 'jest-environment-jsdom',
+  // Run this before anything else—so fetch gets polyfilled for OpenAI
+  setupFiles: ['openai/shims/node'],
+  // Then do your other test setup
+  setupFilesAfterEnv: ['<rootDir>/tests/testSetup.js'],
+  moduleNameMapper: {
+    '\\.(css|png|jpg|jpeg|gif|svg)$': 'identity-obj-proxy'
+  },
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest'
+  },
+  moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
+};
