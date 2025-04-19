@@ -30,3 +30,24 @@ describe('AddVocabForm', () => {
     expect(mockHandleAdd).not.toHaveBeenCalled()
   })
 })
+
+it('calls handleAddVocab once when at least one field is non‑empty', async () => {
+  const mockHandleAdd = jest.fn().mockResolvedValue()
+  const mockSetNewWord = jest.fn()
+  // Start with a non‑empty word
+  const newWord = { word: 'xin', translation: '' }
+
+  render(
+    React.createElement(AddVocabForm, {
+      newWord,
+      setNewWord: mockSetNewWord,
+      handleAddVocab: mockHandleAdd,
+    })
+  )
+
+  const addButton = screen.getByRole('button', { name: /add vocab/i })
+  fireEvent.click(addButton)
+
+  // handleAddVocab should be called exactly once
+  expect(mockHandleAdd).toHaveBeenCalledTimes(1)
+})
