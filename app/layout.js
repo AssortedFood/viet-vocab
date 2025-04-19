@@ -3,6 +3,7 @@ import SWRegister from "./sw-register"; // ✅ Import Service Worker Registratio
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppThemeProvider from "./theme-provider";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,7 +40,11 @@ export default function RootLayout({ children }) {
         }}
       >
         <SWRegister /> {/* ✅ Registers Service Worker */}
-        <AppThemeProvider>{children}</AppThemeProvider>
+        <Providers>
+          <AppThemeProvider>
+            {children}
+          </AppThemeProvider>
+        </Providers>
       </body>
     </html>
   );
