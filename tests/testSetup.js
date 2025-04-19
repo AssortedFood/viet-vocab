@@ -1,8 +1,20 @@
 // tests/testSetup.js
 // Global test setup for Jest + React Testing Library
+import '@testing-library/jest-dom'
 
-import '@testing-library/jest-dom'; // adds toBeInTheDocument(), etc.
+// Polyfill a minimal WHATWG Response for Next.js route handlers
+global.Response = class {
+  constructor(body, init = {}) {
+    this._body = body
+    this.status = init.status ?? 200
+    this.headers = init.headers ?? {}
+  }
 
-// If you ever need to polyfill fetch:
-// // import 'whatwg-fetch';
-// // or: global.fetch = require('jest-fetch-mock');
+  static json(body, init) {
+    return new Response(body, init)
+  }
+
+  async json() {
+    return this._body
+  }
+}
