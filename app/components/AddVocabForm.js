@@ -1,6 +1,19 @@
-import { TextField, Button } from "@mui/material";
+import { useState } from "react";
+import { TextField, Button, Typography } from "@mui/material";
 
 export default function AddVocabForm({ newWord, setNewWord, handleAddVocab }) {
+  const [validationError, setValidationError] = useState("");
+
+  async function onClickAdd() {
+    if (!newWord.word.trim() && !newWord.translation.trim()) {
+      setValidationError("Please enter either a Vietnamese word or an English translation.");
+      return;
+    }
+
+    setValidationError("");
+    await handleAddVocab();
+  }
+
   return (
     <div style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "20px" }}>
       <TextField
@@ -17,11 +30,18 @@ export default function AddVocabForm({ newWord, setNewWord, handleAddVocab }) {
         onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })}
         sx={{ marginBottom: 1 }}
       />
+
+      {validationError && (
+        <Typography color="error" sx={{ mb: 1 }}>
+          {validationError}
+        </Typography>
+      )}
+
       <Button
         variant="contained"
         color="success"
         fullWidth
-        onClick={handleAddVocab}
+        onClick={onClickAdd}
         sx={{ mb: 2, bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}
       >
         Add Vocab
