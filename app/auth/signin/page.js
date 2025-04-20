@@ -12,8 +12,6 @@ import FacebookIcon from "./icons/facebook.svg";
 import GithubIcon from "./icons/github.svg";
 import LinkedInIcon from "./icons/linkedin.svg";
 import XIcon from "./icons/x.svg";
-
-// Eye‐toggle icon imports (also URLs)
 import PasswordShowIcon from "./icons/password-show.svg";
 import PasswordHideIcon from "./icons/password-hide.svg";
 
