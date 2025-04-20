@@ -6,6 +6,13 @@ import { getProviders, signIn } from "next-auth/react";
 import Image from "next/image";
 import styles from "./page.module.css";
 
+// SVG logo imports
+import GoogleIcon from "./icons/google.svg";
+import FacebookIcon from "./icons/facebook.svg";
+import GithubIcon from "./icons/github.svg";
+import LinkedInIcon from "./icons/linkedin.svg";
+import XIcon from "./icons/x.svg";
+
 // ——— ATTEMPT TO LOAD AN EXTERNAL colors.js IF YOU'VE GOT ONE ———
 let externalColors = {};
 try {
@@ -19,17 +26,15 @@ const AUTH_CONFIG = {
   providers: {
     google:   true,
     facebook: true,
-    twitter:  true,
+    x:        true, // "X" is used for Twitter
     github:   true,
     linkedin: true,
-    apple:    true,
-    discord:  true,
   },
   showEmailForm:          true,
   showRegisterLink:       true,
   showForgotPasswordLink: true,
   showSeparators:         true,
-  showRecaptchaBranding:  false,
+  showRecaptchaBranding:  true,
   colors: {
     bg:        "#f8f7ec",
     fg:        "#1b222c",
@@ -44,6 +49,14 @@ const AUTH_CONFIG = {
 
 const THEME = { ...AUTH_CONFIG.colors, ...externalColors };
 
+const ICONS = {
+  google: GoogleIcon,
+  facebook: FacebookIcon,
+  github: GithubIcon,
+  linkedin: LinkedInIcon,
+  x: XIcon,
+};
+
 export default function SignInPage() {
   const [providers, setProviders] = useState(null);
 
@@ -57,16 +70,18 @@ export default function SignInPage() {
     .filter(([, enabled]) => enabled)
     .map(([id]) => id);
 
-  const allProviders = enabledIds.map((id) =>
-    providers[id]
-      ? providers[id]
+  const allProviders = enabledIds.map((id) => {
+    const icon = ICONS[id] || null;
+    const provider = providers[id];
+    return provider
+      ? { ...provider, logo: icon }
       : {
           id,
           name: id.charAt(0).toUpperCase() + id.slice(1),
-          logo: `/icons/${id}.svg`,
+          logo: icon,
           callback: "/",
-        }
-  );
+        };
+  });
 
   return (
     <div
@@ -89,7 +104,14 @@ export default function SignInPage() {
                 }}
                 onClick={() => signIn(p.id, { callbackUrl: p.callback || "/" })}
               >
-                <Image src={p.logo} alt={`${p.name} logo`} width={20} height={20} />
+                {p.logo && (
+                  <Image
+                    src={p.logo}
+                    alt={`${p.name} logo`}
+                    width={20}
+                    height={20}
+                  />
+                )}
                 <span>Sign in with {p.name}</span>
               </button>
             ))}
@@ -106,7 +128,11 @@ export default function SignInPage() {
         )}
 
         {AUTH_CONFIG.showEmailForm && (
-          <form className={styles.form} action="/api/auth/callback/credentials" method="POST">
+          <form
+            className={styles.form}
+            action="/api/auth/callback/credentials"
+            method="POST"
+          >
             <input name="csrfToken" type="hidden" />
 
             <label>Email</label>
