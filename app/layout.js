@@ -1,5 +1,5 @@
 // app/layout.js
-import SWRegister from "./sw-register"; // ✅ Import Service Worker Registration
+import SWRegister from "./sw-register";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AppThemeProvider from "./theme-provider";

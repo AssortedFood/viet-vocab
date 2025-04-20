@@ -36,32 +36,56 @@ const AUTH_CONFIG = {
   showSeparators:         true,
   showRecaptchaBranding:  true,
   colors: {
-    bg:        "#f8f7ec",
-    fg:        "#1b222c",
-    btn:       "#fff",
-    btnBorder: "#ccc",
-    btnText:   "#1b222c",
-    accent:    "#098842",
-    separator: "#ccc",
-  },
+    bg:        "#fafafa", // Background
+    fg:        "#212121", // Foreground text
+    btn:       "#ffffff", // Button background
+    btnBorder: "#e0e0e0", // Button border
+    btnText:   "#212121", // Button text
+    accent:    "#1976d2", // Primary accent (Blue 700)
+    separator: "#bdbdbd", // Separator lines
+  }
 };
 // ——— END CONFIG ———
 
 const THEME = { ...AUTH_CONFIG.colors, ...externalColors };
 
 const ICONS = {
-  google: GoogleIcon,
+  google:   GoogleIcon,
   facebook: FacebookIcon,
-  github: GithubIcon,
+  github:   GithubIcon,
   linkedin: LinkedInIcon,
-  x: XIcon,
+  x:        XIcon,
 };
 
 export default function SignInPage() {
   const [providers, setProviders] = useState(null);
 
+  // Fetch NextAuth providers
   useEffect(() => {
     getProviders().then((prov) => setProviders(prov));
+  }, []);
+
+  // Apply CSS variable overrides to :root
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--color-bg",        THEME.bg);
+    root.style.setProperty("--color-fg",        THEME.fg);
+    root.style.setProperty("--color-btn",       THEME.btn);
+    root.style.setProperty("--color-btnBorder", THEME.btnBorder);
+    root.style.setProperty("--color-btnText",   THEME.btnText);
+    root.style.setProperty("--color-accent",    THEME.accent);
+    root.style.setProperty("--color-separator", THEME.separator);
+
+    return () => {
+      // clean up on unmount
+      root.style.removeProperty("--color-bg");
+      root.style.removeProperty("--color-fg");
+      root.style.removeProperty("--color-btn");
+      root.style.removeProperty("--color-btnBorder");
+      root.style.removeProperty("--color-btnText");
+      root.style.removeProperty("--color-accent");
+      root.style.removeProperty("--color-separator");
+    };
   }, []);
 
   if (!providers) return null;
@@ -84,10 +108,7 @@ export default function SignInPage() {
   });
 
   return (
-    <div
-      className={styles.page}
-      style={{ background: THEME.bg, color: THEME.fg }}
-    >
+    <div className={styles.page}>
       <div className={styles.card}>
         <h1 className={styles.heading}>Sign in to VietVocab</h1>
 
@@ -97,12 +118,9 @@ export default function SignInPage() {
               <button
                 key={p.id}
                 className={styles.btn}
-                style={{
-                  borderColor: THEME.btnBorder,
-                  background: THEME.btn,
-                  color: THEME.btnText,
-                }}
-                onClick={() => signIn(p.id, { callbackUrl: p.callback || "/" })}
+                onClick={() =>
+                  signIn(p.id, { callbackUrl: p.callback || "/" })
+                }
               >
                 {p.logo && (
                   <Image
@@ -117,12 +135,7 @@ export default function SignInPage() {
             ))}
 
             {AUTH_CONFIG.showSeparators && (
-              <div
-                className={styles.separator}
-                style={{ "--sep-color": THEME.separator }}
-              >
-                OR
-              </div>
+              <div className={styles.separator}>OR</div>
             )}
           </>
         )}
@@ -143,35 +156,27 @@ export default function SignInPage() {
               <input name="password" type="password" required />
             </div>
 
-            <button
-              type="submit"
-              className={`${styles.btn} ${styles.accent}`}
-              style={{
-                background: THEME.accent,
-                borderColor: THEME.accent,
-                color: "#fff",
-              }}
-            >
+            <button type="submit" className={`${styles.btn} ${styles.accent}`}>
               Log in
             </button>
 
             {AUTH_CONFIG.showSeparators && (
-              <div
-                className={styles.separator}
-                style={{ "--sep-color": THEME.separator }}
-              >
-                OR
-              </div>
+              <div className={styles.separator}>OR</div>
             )}
           </form>
         )}
 
         <div className={styles.links}>
           {AUTH_CONFIG.showRegisterLink && (
-            <a href="/register">Don’t have an account? Register</a>
+            <p className={styles.loginText}>
+              Don’t have an account?
+              <a href="/register">Register</a>
+            </p>
           )}
           {AUTH_CONFIG.showForgotPasswordLink && (
-            <a href="/forgot-password">Forgot your password?</a>
+            <a href="/forgot-password" className={styles.forgotLink}>
+              Forgot your password?
+            </a>
           )}
         </div>
 
