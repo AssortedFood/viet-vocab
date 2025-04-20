@@ -8,12 +8,12 @@
 
 .page {
   /* color variables */
-  --color-fg:        #212121;
+  --color-fg:        #111827;
   --color-btn:       #ffffff;
-  --color-btnBorder: #e0e0e0;
-  --color-btnText:   #212121;
-  --color-accent:    #1976d2;
-  --color-separator: #bdbdbd;
+  --color-btnBorder: #E5E7EB;
+  --color-btnText:   #111827;
+  --color-accent:    #2563EB;
+  --color-separator: #E5E7EB;
 
   /* full‑height wrapper with padding all around */
   min-height: 100vh;
@@ -157,4 +157,20 @@
   margin-top: 1.5rem;
   font-size: 0.75rem;
   color: #666;
+}
+
+.recaptcha {
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--color-fg); /* your neutral text color */
+}
+
+.recaptcha a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.recaptcha a:hover,
+.recaptcha a:focus {
+  text-decoration: underline;
 }

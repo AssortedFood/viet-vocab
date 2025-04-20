@@ -13,41 +13,22 @@ import GithubIcon from "./icons/github.svg";
 import LinkedInIcon from "./icons/linkedin.svg";
 import XIcon from "./icons/x.svg";
 
-// ——— ATTEMPT TO LOAD AN EXTERNAL colors.js IF YOU'VE GOT ONE ———
-let externalColors = {};
-try {
-  externalColors = require("../../colors").default || {};
-} catch {
-  externalColors = {};
-}
-
 // ——— CONFIGURE EVERYTHING HERE ———
 const AUTH_CONFIG = {
   providers: {
     google:   true,
-    facebook: true,
-    x:        true, // "X" is used for Twitter
-    github:   true,
-    linkedin: true,
+    facebook: false,
+    x:        false,
+    github:   false,
+    linkedin: false,
   },
   showEmailForm:          true,
   showRegisterLink:       true,
   showForgotPasswordLink: true,
   showSeparators:         true,
   showRecaptchaBranding:  true,
-  colors: {
-    bg:        "#fafafa", // Background
-    fg:        "#212121", // Foreground text
-    btn:       "#ffffff", // Button background
-    btnBorder: "#e0e0e0", // Button border
-    btnText:   "#212121", // Button text
-    accent:    "#1976d2", // Primary accent (Blue 700)
-    separator: "#bdbdbd", // Separator lines
-  }
 };
 // ——— END CONFIG ———
-
-const THEME = { ...AUTH_CONFIG.colors, ...externalColors };
 
 const ICONS = {
   google:   GoogleIcon,
@@ -63,29 +44,6 @@ export default function SignInPage() {
   // Fetch NextAuth providers
   useEffect(() => {
     getProviders().then((prov) => setProviders(prov));
-  }, []);
-
-  // Apply CSS variable overrides to :root
-  useEffect(() => {
-    const root = document.documentElement;
-    root.style.setProperty("--color-bg",        THEME.bg);
-    root.style.setProperty("--color-fg",        THEME.fg);
-    root.style.setProperty("--color-btn",       THEME.btn);
-    root.style.setProperty("--color-btnBorder", THEME.btnBorder);
-    root.style.setProperty("--color-btnText",   THEME.btnText);
-    root.style.setProperty("--color-accent",    THEME.accent);
-    root.style.setProperty("--color-separator", THEME.separator);
-
-    return () => {
-      // clean up on unmount
-      root.style.removeProperty("--color-bg");
-      root.style.removeProperty("--color-fg");
-      root.style.removeProperty("--color-btn");
-      root.style.removeProperty("--color-btnBorder");
-      root.style.removeProperty("--color-btnText");
-      root.style.removeProperty("--color-accent");
-      root.style.removeProperty("--color-separator");
-    };
   }, []);
 
   if (!providers) return null;
