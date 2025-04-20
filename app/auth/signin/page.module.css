@@ -174,3 +174,36 @@
 .recaptcha a:focus {
   text-decoration: underline;
 }
+
+/* app/auth/signin/page.module.css */
+
+.passwordWrapper {
+  position: relative;
+}
+
+.passwordWrapper input {
+  width: 100%;
+  padding-right: 2.5rem; /* space for the eye button */
+}
+
+/* Eye‐toggle button */
+.eyeButton {
+  position: absolute;
+  top: 35%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-fg);
+}
+
+/* Size the SVG nicely */
+.eyeButton svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}

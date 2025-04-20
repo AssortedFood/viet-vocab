@@ -6,12 +6,16 @@ import { getProviders, signIn } from "next-auth/react";
 import Image from "next/image";
 import styles from "./page.module.css";
 
-// SVG logo imports
+// SVG logo imports (these become URLs)
 import GoogleIcon from "./icons/google.svg";
 import FacebookIcon from "./icons/facebook.svg";
 import GithubIcon from "./icons/github.svg";
 import LinkedInIcon from "./icons/linkedin.svg";
 import XIcon from "./icons/x.svg";
+
+// Eye‐toggle icon imports (also URLs)
+import PasswordShowIcon from "./icons/password-show.svg";
+import PasswordHideIcon from "./icons/password-hide.svg";
 
 // ——— CONFIGURE EVERYTHING HERE ———
 const AUTH_CONFIG = {
@@ -40,6 +44,7 @@ const ICONS = {
 
 export default function SignInPage() {
   const [providers, setProviders] = useState(null);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   // Fetch NextAuth providers
   useEffect(() => {
@@ -112,10 +117,36 @@ export default function SignInPage() {
 
               <label>Password</label>
               <div className={styles.passwordWrapper}>
-                <input name="password" type="password" required />
+                <input
+                  name="password"
+                  type={passwordVisible ? "text" : "password"}
+                  required
+                />
+                <button
+                  type="button"
+                  className={styles.eyeButton}
+                  onClick={() => setPasswordVisible((v) => !v)}
+                  aria-label={
+                    passwordVisible ? "Hide password" : "Show password"
+                  }
+                >
+                  <Image
+                    src={passwordVisible ? PasswordHideIcon : PasswordShowIcon}
+                    alt={
+                      passwordVisible
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                    width={20}
+                    height={20}
+                  />
+                </button>
               </div>
 
-              <button type="submit" className={`${styles.btn} ${styles.accent}`}>
+              <button
+                type="submit"
+                className={`${styles.btn} ${styles.accent}`}
+              >
                 Log in
               </button>
 
@@ -142,8 +173,14 @@ export default function SignInPage() {
           {AUTH_CONFIG.showRecaptchaBranding && (
             <p className={styles.recaptcha}>
               The site is protected by reCAPTCHA and the Google{" "}
-              <a href="https://policies.google.com/privacy">Privacy Policy</a> and{" "}
-              <a href="https://policies.google.com/terms">Terms of Service</a> apply.
+              <a href="https://policies.google.com/privacy">
+                Privacy Policy
+              </a>{" "}
+              and{" "}
+              <a href="https://policies.google.com/terms">
+                Terms of Service
+              </a>{" "}
+              apply.
             </p>
           )}
         </div>
