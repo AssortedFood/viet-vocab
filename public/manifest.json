@@ -1,6 +1,6 @@
 {
-    "name": "Viet Vocab",
-    "short_name": "VietVocab",
+    "name": "vocab",
+    "short_name": "vocab",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#F5F3E7",
