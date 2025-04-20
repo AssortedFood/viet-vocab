@@ -1,9 +1,6 @@
 # TODO
 
 - auth
-    - add svgs
-    - extract css and reference inside of page.jsx
-    - rename to .js
     - write tests
     - add recaptcha
     - tests for recaptcha

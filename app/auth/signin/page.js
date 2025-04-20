@@ -21,15 +21,15 @@ import PasswordHideIcon from "./icons/password-hide.svg";
 const AUTH_CONFIG = {
   providers: {
     google:   true,
-    facebook: true,
-    x:        true,
-    github:   true,
-    linkedin: true,
+    facebook: false,
+    x:        false,
+    github:   false,
+    linkedin: false,
   },
-  showEmailForm:          true,
-  showRegisterLink:       true,
-  showForgotPasswordLink: true,
-  showSeparators:         true,
+  showEmailForm:          false,
+  showRegisterLink:       false,
+  showForgotPasswordLink: false,
+  showSeparators:         false,
   showRecaptchaBranding:  true,
 };
 // ——— END CONFIG ———
