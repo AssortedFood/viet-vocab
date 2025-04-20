@@ -109,84 +109,86 @@ export default function SignInPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
-        <h1 className={styles.heading}>Sign in to VietVocab</h1>
+      <div className={styles.cardMargin}>
+        <div className={styles.card}>
+          <h1 className={styles.heading}>Sign in to Vocab</h1>
 
-        {allProviders.length > 0 && (
-          <>
-            {allProviders.map((p) => (
-              <button
-                key={p.id}
-                className={styles.btn}
-                onClick={() =>
-                  signIn(p.id, { callbackUrl: p.callback || "/" })
-                }
-              >
-                {p.logo && (
-                  <Image
-                    src={p.logo}
-                    alt={`${p.name} logo`}
-                    width={20}
-                    height={20}
-                  />
-                )}
-                <span>Sign in with {p.name}</span>
+          {allProviders.length > 0 && (
+            <>
+              {allProviders.map((p) => (
+                <button
+                  key={p.id}
+                  className={styles.btn}
+                  onClick={() =>
+                    signIn(p.id, { callbackUrl: p.callback || "/" })
+                  }
+                >
+                  {p.logo && (
+                    <Image
+                      src={p.logo}
+                      alt={`${p.name} logo`}
+                      width={20}
+                      height={20}
+                    />
+                  )}
+                  <span>Sign in with {p.name}</span>
+                </button>
+              ))}
+
+              {AUTH_CONFIG.showSeparators && (
+                <div className={styles.separator}>OR</div>
+              )}
+            </>
+          )}
+
+          {AUTH_CONFIG.showEmailForm && (
+            <form
+              className={styles.form}
+              action="/api/auth/callback/credentials"
+              method="POST"
+            >
+              <input name="csrfToken" type="hidden" />
+
+              <label>Email</label>
+              <input name="email" type="email" required />
+
+              <label>Password</label>
+              <div className={styles.passwordWrapper}>
+                <input name="password" type="password" required />
+              </div>
+
+              <button type="submit" className={`${styles.btn} ${styles.accent}`}>
+                Log in
               </button>
-            ))}
 
-            {AUTH_CONFIG.showSeparators && (
-              <div className={styles.separator}>OR</div>
+              {AUTH_CONFIG.showSeparators && (
+                <div className={styles.separator}>OR</div>
+              )}
+            </form>
+          )}
+
+          <div className={styles.links}>
+            {AUTH_CONFIG.showRegisterLink && (
+              <p className={styles.loginText}>
+                Don’t have an account?
+                <a href="/register">Register</a>
+              </p>
             )}
-          </>
-        )}
-
-        {AUTH_CONFIG.showEmailForm && (
-          <form
-            className={styles.form}
-            action="/api/auth/callback/credentials"
-            method="POST"
-          >
-            <input name="csrfToken" type="hidden" />
-
-            <label>Email</label>
-            <input name="email" type="email" required />
-
-            <label>Password</label>
-            <div className={styles.passwordWrapper}>
-              <input name="password" type="password" required />
-            </div>
-
-            <button type="submit" className={`${styles.btn} ${styles.accent}`}>
-              Log in
-            </button>
-
-            {AUTH_CONFIG.showSeparators && (
-              <div className={styles.separator}>OR</div>
+            {AUTH_CONFIG.showForgotPasswordLink && (
+              <a href="/forgot-password" className={styles.forgotLink}>
+                Forgot your password?
+              </a>
             )}
-          </form>
-        )}
+          </div>
 
-        <div className={styles.links}>
-          {AUTH_CONFIG.showRegisterLink && (
-            <p className={styles.loginText}>
-              Don’t have an account?
-              <a href="/register">Register</a>
+          {AUTH_CONFIG.showRecaptchaBranding && (
+            <p className={styles.recaptcha}>
+              The site is protected by reCAPTCHA and the Google{" "}
+              <a href="https://policies.google.com/privacy">Privacy Policy</a> and{" "}
+              <a href="https://policies.google.com/terms">Terms of Service</a> apply.
             </p>
           )}
-          {AUTH_CONFIG.showForgotPasswordLink && (
-            <a href="/forgot-password" className={styles.forgotLink}>
-              Forgot your password?
-            </a>
-          )}
         </div>
-
-        {AUTH_CONFIG.showRecaptchaBranding && (
-          <p className={styles.recaptcha}>
-            The site is protected by reCAPTCHA and the Google{" "}
-            <a href="https://policies.google.com/privacy">Privacy Policy</a> and{" "}
-            <a href="https://policies.google.com/terms">Terms of Service</a> apply.
-          </p>
-        )}
       </div>
     </div>
   );

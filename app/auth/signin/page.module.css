@@ -21,7 +21,6 @@
   align-items: flex-start;      /* stick to top so you always see the header */
   justify-content: center;
   color: var(--color-fg);
-  padding: 2rem;                /* ← horizontal & vertical breathing room */
 }
 
 .card {
@@ -36,6 +35,12 @@
   /* inner padding only—no more external margins */
   padding: 2rem;
   text-align: center;
+}
+
+.cardMargin {
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
 }
 
 .card h1 {
