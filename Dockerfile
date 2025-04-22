@@ -8,6 +8,6 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 COPY --from=builder /app ./
-EXPOSE 3001
-ENV PORT=3001
+EXPOSE 3000
+ENV PORT=3000
 CMD ["npm", "run", "start"]

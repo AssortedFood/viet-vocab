@@ -1,3 +1,4 @@
+// app/components/SearchBar.js
 import { TextField } from "@mui/material";
 
 export default function SearchBar({ query, setQuery }) {

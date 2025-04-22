@@ -1,3 +1,4 @@
+// app/components/VocabList.js
 import VocabCard from "./VocabCard";
 
 export default function VocabList({

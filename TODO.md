@@ -1,10 +1,16 @@
 # TODO
 
-- show the example translation on the vocab card
-- create the "regenerate card" functionality
-- match user device settings dark || light mode
+- update Dockerfile
 - add recaptcha
 - tests for recaptcha
-- update README
-- extract blobs from db and uses hashing to reference
+- add support for more auth providers
 - add language code to db and use in elevenlabs.js
+- extract blobs from db and uses hashing to reference
+
+- full multi-language refactor
+- user database + one per user SQLite db refactor
+- implement a welcome new user flow where users choose a source and dest lang
+- implement "add a new lexicon" flow 
+- basic account settings page
+- 
+- update README

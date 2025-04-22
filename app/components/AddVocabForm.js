@@ -1,5 +1,6 @@
+// app/components/AddVocabForm.js
 import { useState } from "react";
-import { TextField, Button, Typography } from "@mui/material";
+import { Box, TextField, Button, Typography } from "@mui/material";
 
 export default function AddVocabForm({ newWord, setNewWord, handleAddVocab }) {
   const [validationError, setValidationError] = useState("");
@@ -15,10 +16,10 @@ export default function AddVocabForm({ newWord, setNewWord, handleAddVocab }) {
   }
 
   return (
-    <div style={{ border: "1px solid #ddd", padding: "10px", marginBottom: "20px" }}>
+    <Box sx={{ p: "10px", mb: "20px" }}>
       <TextField
         fullWidth
-        label="Vietnamese"
+        label="Vietnamese Word"
         value={newWord.word}
         onChange={(e) => setNewWord({ ...newWord, word: e.target.value })}
         sx={{ marginBottom: 1 }}
@@ -39,13 +40,13 @@ export default function AddVocabForm({ newWord, setNewWord, handleAddVocab }) {
 
       <Button
         variant="contained"
-        color="success"
+        color="primary"
         fullWidth
         onClick={onClickAdd}
         sx={{ mb: 2, bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}
       >
         Add Vocab
       </Button>
-    </div>
+    </Box>
   );
 }

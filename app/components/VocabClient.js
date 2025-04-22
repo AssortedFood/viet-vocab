@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { flushSync } from "react-dom";
 import {
   Container,
   Button,
@@ -47,11 +48,16 @@ export default function VocabClient() {
     try {
       const res = await globalThis.fetch("/api/vocab/all?includeAudio=false");
       const data = await res.json();
-      setAllVocab(data);
+      flushSync(() => {
+        setAllVocab(data);
+        setLoading(false);
+      });
     } catch (err) {
       console.error("Error fetching vocab:", err);
     }
-    setLoading(false);
+    flushSync(() => {
+      setLoading(false);
+    });
   }
 
   async function playAudio(id, type) {
