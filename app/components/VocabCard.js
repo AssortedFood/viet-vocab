@@ -14,8 +14,7 @@ export default function VocabCard({ vocab, handleDeleteVocab, playAudio }) {
             sx={{ ml: 1 }}
           >
             <VolumeUp fontSize="small" />
-          </IconButton>
-           → {vocab.word_translation}
+          </IconButton>→ {vocab.word_translation}
         </Typography>
 
         <Typography variant="body2" color="textSecondary">
@@ -26,11 +25,7 @@ export default function VocabCard({ vocab, handleDeleteVocab, playAudio }) {
             sx={{ ml: 1 }}
           >
             <VolumeUp fontSize="small" />
-          </IconButton>
-        </Typography>
-
-        <Typography variant="body2" color="textSecondary">
-          {vocab.example_translation}
+          </IconButton>→ {vocab.example_translation}
         </Typography>
 
         <Typography
