@@ -13,7 +13,7 @@ export const authOptions = {
     signIn: "/auth/signin",    // ← must match middleware
   },
   secret: process.env.NEXTAUTH_SECRET,
-  useSecureCookies: false,    // set false in dev
+  useSecureCookies: process.env.NODE_ENV === 'production',
   debug: true,                // helpful for seeing what’s happening
 };
 
