@@ -20,13 +20,12 @@ export default function VocabClient() {
   const [loading, setLoading] = useState(true);
   const [newWord, setNewWord] = useState({
     word: "",
-    translation: "",
-    description: "",
+    word_translation: "",
+    example: "",
+    example_translation: "",
     category: "",
   });
   const [showAddWord, setShowAddWord] = useState(false);
-  const [editingWordId, setEditingWordId] = useState(null);
-  const [editingWord, setEditingWord] = useState(null);
 
   useEffect(() => {
     fetchAllVocab();
@@ -36,7 +35,7 @@ export default function VocabClient() {
     const q = removeDiacritics(query.trim().toLowerCase());
     setFilteredVocab(
       allVocab.filter((entry) =>
-        ["word", "translation", "description", "category"].some((field) =>
+        ["word", "word_translation", "example", "example_translation", "category"].some((field) =>
           removeDiacritics((entry[field] || "").toLowerCase()).includes(q)
         )
       )
@@ -68,14 +67,14 @@ export default function VocabClient() {
   }
 
   async function handleAddVocab() {
-    if (!newWord.word && !newWord.translation) return;
+    if (!newWord.word && !newWord.word_translation) return;
     try {
       await globalThis.fetch("/api/vocab", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newWord),
       });
-      setNewWord({ word: "", translation: "", description: "", category: "" });
+      setNewWord({ word: "", word_translation: "", example: "", example_translation: "", category: "" });
       setShowAddWord(false);
       fetchAllVocab();
     } catch (err) {
@@ -90,40 +89,6 @@ export default function VocabClient() {
     } catch (err) {
       console.error("Error deleting vocab:", err);
     }
-  }
-
-  function startEditing(vocab) {
-    setEditingWordId(vocab.id);
-    setEditingWord({ ...vocab });
-  }
-
-  function handleEditChange(field, value) {
-    setEditingWord((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function handleEditSave(id) {
-    if (!editingWord.word || !editingWord.translation) return;
-    try {
-      const res = await globalThis.fetch("/api/vocab", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, ...editingWord }),
-      });
-      if (!res.ok) {
-        console.error("Edit failed:", await res.json());
-        return;
-      }
-      setEditingWordId(null);
-      setEditingWord(null);
-      fetchAllVocab();
-    } catch (err) {
-      console.error("Error saving vocab:", err);
-    }
-  }
-
-  function cancelEditing() {
-    setEditingWordId(null);
-    setEditingWord(null);
   }
 
   return (
@@ -152,12 +117,6 @@ export default function VocabClient() {
 
       <VocabList
         vocabList={filteredVocab}
-        editingWordId={editingWordId}
-        editingWord={editingWord}
-        startEditing={startEditing}
-        handleEditChange={handleEditChange}
-        handleEditSave={handleEditSave}
-        cancelEditing={cancelEditing}
         handleDeleteVocab={handleDeleteVocab}
         playAudio={playAudio}
       />

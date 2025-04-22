@@ -16,16 +16,18 @@ describe('correctVocabEntry fallback when no API key', () => {
 
   it('returns original values if OPENAI_API_KEY is unset', async () => {
     const word = 'cam on'
-    const translation = 'thank you'
-    const description = 'a phrase demonstrating usage'
+    const word_translation = 'thank you'
+    const example = 'an example demonstrating usage'
+    const example_translation = 'a translation of the example'
     const category = 'greetings'
 
-    const result = await correctVocabEntry(word, translation, description, category)
+    const result = await correctVocabEntry(word, word_translation, example, example_translation, category)
 
     expect(result).toEqual({
       word,
-      translation,
-      description,
+      word_translation,
+      example,
+      example_translation,
       category,
     })
   })

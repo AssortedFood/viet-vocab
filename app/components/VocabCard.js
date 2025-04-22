@@ -7,7 +7,7 @@ export default function VocabCard({ vocab, handleDeleteVocab, playAudio }) {
     <Card sx={{ mb: 1, p: 1 }}>
       <CardContent>
         <Typography variant="h6">
-          {vocab.word} → {vocab.translation}
+          {vocab.word} → {vocab.word_translation}
           <IconButton
             size="small"
             onClick={() => playAudio(vocab.id, "word_audio")}
@@ -18,10 +18,10 @@ export default function VocabCard({ vocab, handleDeleteVocab, playAudio }) {
         </Typography>
 
         <Typography variant="body2" color="textSecondary">
-          {vocab.description}
+          {vocab.example}
           <IconButton
             size="small"
-            onClick={() => playAudio(vocab.id, "description_audio")}
+            onClick={() => playAudio(vocab.id, "example_audio")}
             sx={{ ml: 1 }}
           >
             <VolumeUp fontSize="small" />

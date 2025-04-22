@@ -5,7 +5,7 @@ export default function AddVocabForm({ newWord, setNewWord, handleAddVocab }) {
   const [validationError, setValidationError] = useState("");
 
   async function onClickAdd() {
-    if (!newWord.word.trim() && !newWord.translation.trim()) {
+    if (!newWord.word.trim() && !newWord.word_translation.trim()) {
       setValidationError("Please enter either a Vietnamese word or an English translation.");
       return;
     }
@@ -26,8 +26,8 @@ export default function AddVocabForm({ newWord, setNewWord, handleAddVocab }) {
       <TextField
         fullWidth
         label="English Translation"
-        value={newWord.translation}
-        onChange={(e) => setNewWord({ ...newWord, translation: e.target.value })}
+        value={newWord.word_translation}
+        onChange={(e) => setNewWord({ ...newWord, word_translation: e.target.value })}
         sx={{ marginBottom: 1 }}
       />
 

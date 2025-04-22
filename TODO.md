@@ -1,6 +1,6 @@
 # TODO
 
-- break the card schema description into descrition & description translation, only pass description translation to elevenlabs
+- show the example translation on the vocab card
 - create the "regenerate card" functionality
 - match user device settings dark || light mode
 - add recaptcha

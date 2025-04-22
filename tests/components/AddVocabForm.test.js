@@ -10,7 +10,7 @@ describe('AddVocabForm', () => {
 
     render(
       React.createElement(AddVocabForm, {
-        newWord: { word: '', translation: '' },
+        newWord: { word: '', word_translation: '' },
         setNewWord: mockSetNewWord,
         handleAddVocab: mockHandleAdd,
       })
@@ -35,7 +35,7 @@ it('calls handleAddVocab once when at least one field is non‑empty', async () 
   const mockHandleAdd = jest.fn().mockResolvedValue()
   const mockSetNewWord = jest.fn()
   // Start with a non‑empty word
-  const newWord = { word: 'xin', translation: '' }
+  const newWord = { word: 'xin', word_translation: '' }
 
   render(
     React.createElement(AddVocabForm, {

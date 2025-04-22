@@ -37,8 +37,9 @@ describe('app/api/vocab/route.js handlers', () => {
         {
           id: 1,
           word: 'test',
-          translation: 'test',
-          description: '',
+          word_translation: 'test',
+          example: '',
+          example_translation: '',
           category: '',
           familiarity: 1,
           createdAt: '2025-04-19',
@@ -70,10 +71,10 @@ describe('app/api/vocab/route.js handlers', () => {
     it('returns 201 with lastID on success', async () => {
       vocabLib.addVocab.mockResolvedValue({ lastID: 42 })
 
-      const req = { json: async () => ({ word: 'xin', translation: 'hello' }) }
+      const req = { json: async () => ({ word: 'xin', word_translation: 'hello' }) }
       const res = await postHandler(req)
 
-      expect(vocabLib.addVocab).toHaveBeenCalledWith('xin', 'hello', '', '')
+      expect(vocabLib.addVocab).toHaveBeenCalledWith('xin', 'hello', '', '', '')
       expect(res.status).toBe(201)
       expect(await res.json()).toEqual({ success: true, lastID: 42 })
     })
@@ -124,27 +125,6 @@ describe('app/api/vocab/route.js handlers', () => {
 
       expect(res.status).toBe(400)
       expect(await res.json()).toEqual({ error: 'Invalid ID or familiarity score.' })
-    })
-  })
-
-  describe('PATCH handler', () => {
-    it('returns 200 on successful edit', async () => {
-      vocabLib.editVocab.mockResolvedValue({})
-      const payload = { id: '7', word: 'a', translation: 'b', description: 'd', category: 'c' }
-      const req = { json: async () => payload }
-      const res = await patchHandler(req)
-
-      expect(vocabLib.editVocab).toHaveBeenCalledWith('7', 'a', 'b', 'd', 'c')
-      expect(res.status).toBe(200)
-      expect(await res.json()).toEqual({ success: true, updatedID: '7' })
-    })
-
-    it('returns 400 when required fields missing', async () => {
-      const req = { json: async () => ({ id: '7', word: 'a' }) }
-      const res = await patchHandler(req)
-
-      expect(res.status).toBe(400)
-      expect(await res.json()).toEqual({ error: 'ID, word, and translation are required.' })
     })
   })
 })

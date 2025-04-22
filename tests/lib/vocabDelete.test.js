@@ -1,29 +1,11 @@
-// tests/lib/vocabEditDelete.test.js
+// tests/lib/vocabDelete.test.js
 import 'openai/shims/node'
 jest.mock('../../lib/db.js')
 import { getDB } from '../../lib/db.js'
-import { editVocab, deleteVocab, updateFamiliarity, getCategories } from '../../lib/vocab.js'
+import { deleteVocab, updateFamiliarity, getCategories } from '../../lib/vocab.js'
 
-describe('lib/vocab edit/delete/familiarity/categories', () => {
+describe('lib/vocab delete/familiarity/categories', () => {
   beforeEach(() => jest.resetAllMocks())
-
-  it('editVocab updates the row and returns changes', async () => {
-    const fakeRow = { id: 5, word: 'old', translation: 'old', description: '', category: '' }
-    const db = {
-      get: jest.fn().mockResolvedValue(fakeRow),
-      run: jest.fn().mockResolvedValue({ changes: 1, lastID: null })
-    }
-    getDB.mockResolvedValue(db)
-
-    const res = await editVocab(5, 'newW', 'newT', 'd', 'c')
-    // existingEntry fetched
-    expect(db.get).toHaveBeenCalledWith('SELECT * FROM vocab WHERE id = ?', [5])
-    expect(db.run).toHaveBeenCalledWith(
-      'UPDATE vocab SET word = ?, translation = ?, description = ?, category = ? WHERE id = ?',
-      ['newW', 'newT', 'd', 'c', 5]
-    )
-    expect(res).toEqual({ changes: 1, lastID: null, success: true })
-  })
 
   it('deleteVocab deletes the row by id', async () => {
     const db = { run: jest.fn().mockResolvedValue({ changes: 2 }) }

@@ -6,7 +6,7 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
-    const type = searchParams.get("type"); // expected: 'word_audio' or 'description_audio'
+    const type = searchParams.get("type");
 
     if (!id || !type) {
       return new Response("Missing id or type parameter.", { status: 400 });

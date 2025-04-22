@@ -1,5 +1,6 @@
+// app/api/vocab/route.js
 "use server";
-import { getAllVocab, addVocab, deleteVocab, updateFamiliarity, editVocab } from "../../../lib/vocab";
+import { getAllVocab, addVocab, deleteVocab, updateFamiliarity } from "../../../lib/vocab";
 
 // Handle GET request - Fetch vocab list
 export async function GET(req) {
@@ -21,13 +22,13 @@ export async function GET(req) {
 // Handle POST request - Add new vocab entry
 export async function POST(req) {
   try {
-    const { word, translation, description = "", category = "" } = await req.json();
+    const { word, word_translation, example = "", example_translation = "", category = "" } = await req.json();
 
-    if (!word && !translation) {
+    if (!word && !word_translation) {
       return Response.json({ error: "Either word or translation is required." }, { status: 400 });
     }
 
-    const result = await addVocab(word, translation, description, category);
+    const result = await addVocab(word, word_translation, example, example_translation, category);
     return Response.json({ success: true, lastID: result.lastID }, { status: 201 });
   } catch (error) {
     console.error("❌ Error adding vocab:", error);
@@ -67,24 +68,5 @@ export async function PUT(req) {
   } catch (error) {
     console.error("❌ Error updating familiarity:", error);
     return Response.json({ error: "Failed to update familiarity" }, { status: 500 });
-  }
-}
-
-// Handle PATCH request - Edit vocab entry
-export async function PATCH(req) {
-  try {
-    const { id, word, translation, description = "", category = "" } = await req.json();
-
-    console.log("🔍 PATCH Request Data:", { id, word, translation, description, category });
-
-    if (!id || !word || !translation) {
-      return Response.json({ error: "ID, word, and translation are required." }, { status: 400 });
-    }
-
-    await editVocab(id, word, translation, description, category);
-    return Response.json({ success: true, updatedID: id }, { status: 200 });
-  } catch (error) {
-    console.error("❌ Error editing vocab:", error);
-    return Response.json({ error: "Failed to edit vocab" }, { status: 500 });
   }
 }

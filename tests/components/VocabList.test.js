@@ -6,19 +6,13 @@ import VocabList from '../../app/components/VocabList'
 describe('<VocabList />', () => {
   it('renders a list of VocabCard components', () => {
     const vocabList = [
-      { id: 1, word: 'A', translation: '1', description: '', category: '', },
-      { id: 2, word: 'B', translation: '2', description: '', category: '', },
+      { id: 1, word: 'A', word_translation: '1', example: '', example_translation: '', category: '', },
+      { id: 2, word: 'B', word_translation: '2', example: '', example_translation: '', category: '', },
     ]
 
     render(
       <VocabList
         vocabList={vocabList}
-        editingWordId={null}
-        editingWord={null}
-        startEditing={() => {}}
-        handleEditChange={() => {}}
-        handleEditSave={() => {}}
-        cancelEditing={() => {}}
         handleDeleteVocab={() => {}}
         playAudio={() => {}}
       />

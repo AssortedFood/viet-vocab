@@ -13,15 +13,16 @@ describe('GET /api/vocab/all', () => {
     const fullRow = {
       id: 1,
       word: 'Xin chào',
-      translation: 'Hello',
-      description: 'Greeting',
+      word_translation: 'Hello',
+      example: 'Xin chào mọi người',
+      example_translation: 'Hello everyone',
       category: 'Greetings',
       familiarity: 2,
       createdAt: '2025-04-19T00:00:00.000Z',
       word_audio: Buffer.from('…'),
-      description_audio: Buffer.from('…'),
+      example_audio: Buffer.from('…'),
     }
-    const minimalRow = (({ word_audio, description_audio, ...r }) => r)(fullRow)
+    const minimalRow = (({ word_audio, example_audio, ...r }) => r)(fullRow)
     const fakeDb = { all: jest.fn().mockResolvedValue([ minimalRow ]) }
     getDB.mockResolvedValue(fakeDb)
 
@@ -42,13 +43,14 @@ describe('GET /api/vocab/all', () => {
     const fullRow = {
       id: 2,
       word: 'Tạm biệt',
-      translation: 'Goodbye',
-      description: 'Farewell',
+      word_translation: 'Goodbye',
+      example: 'Tạm biệt bạn',
+      example_translation: 'Goodbye friend',
       category: 'Greetings',
       familiarity: 1,
       createdAt: '2025-04-19T00:00:00.000Z',
       word_audio: Buffer.from('AUDIO1'),
-      description_audio: Buffer.from('AUDIO2'),
+      example_audio: Buffer.from('AUDIO2'),
     }
     const fakeDb = { all: jest.fn().mockResolvedValue([ fullRow ]) }
     getDB.mockResolvedValue(fakeDb)

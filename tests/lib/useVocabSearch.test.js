@@ -5,8 +5,8 @@ import { act } from 'react-dom/test-utils'
 import { useVocabSearch } from '../../lib/useVocabSearch'
 
 const fakeData = [
-  { id: 1, word: 'Xin', translation: 'Hello', description: '', category: '' },
-  { id: 2, word: 'Tạm biệt', translation: 'Goodbye', description: '', category: '' },
+  { id: 1, word: 'Xin', word_translation: 'Hello', example: '', example_translation: '', category: '' },
+  { id: 2, word: 'Tạm biệt', word_translation: 'Goodbye', example: '', example_translation: '', category: '' },
 ]
 
 // A small component to “run” our hook and hand back its API via onReady
@@ -56,7 +56,7 @@ describe('useVocabSearch hook', () => {
     // wait for the next update in filtered
     await waitFor(() => {
       expect(hook.filtered).toEqual([
-        { id: 1, word: 'Xin', translation: 'Hello', description: '', category: '' },
+        { id: 1, word: 'Xin', word_translation: 'Hello', example: '', example_translation: '', category: '' },
       ])
     })
   })

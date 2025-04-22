@@ -46,7 +46,7 @@ describe('getAllVocab()', () => {
     const rows = await getAllVocab({ sortBy: 'word', search: 'foo' })
     expect(fakeDb.all).toHaveBeenCalledWith(
       expect.stringContaining(
-        'SELECT * FROM vocab WHERE word LIKE ? OR translation LIKE ? OR description LIKE ? OR category LIKE ? ORDER BY word DESC'
+        'SELECT * FROM vocab WHERE word LIKE ? OR word_translation LIKE ? OR example LIKE ? OR example_translation LIKE ? OR category LIKE ? ORDER BY word DESC'
       ),
       ['%foo%', '%foo%', '%foo%', '%foo%']
     )
@@ -68,7 +68,7 @@ describe('addVocab()', () => {
 
     // Stub GPT correction and TTS
     correctVocabEntry.mockResolvedValue({
-      word: 'w', translation: 't', description: '', category: ''
+      word: 'w', word_translation: 't', example: '', example_translation: '', category: ''
     })
     textToSpeech.mockResolvedValue(Buffer.from([0x01, 0x02]))
 
@@ -76,19 +76,19 @@ describe('addVocab()', () => {
 
     // Initial INSERT
     expect(runMock).toHaveBeenCalledWith(
-      `INSERT INTO vocab (word, translation, description, category) VALUES (?, ?, ?, ?)`,
-      ['w', 't', '', '']
+      `INSERT INTO vocab (word, word_translation, example, example_translation, category) VALUES (?, ?, ?, ?, ?)`,
+      ['w', 't', '', '', '']
     )
 
     // Correction step
-    expect(correctVocabEntry).toHaveBeenCalledWith('w', 't', '', '')
+    expect(correctVocabEntry).toHaveBeenCalledWith('w', 't', '', '', '')
 
     // Text-to-speech for the word
     expect(textToSpeech).toHaveBeenCalledWith('w')
 
     // Final audio UPDATE
     expect(runMock).toHaveBeenLastCalledWith(
-      `UPDATE vocab SET word_audio = ?, description_audio = ? WHERE id = ?`,
+      `UPDATE vocab SET word_audio = ?, example_audio = ? WHERE id = ?`,
       [Buffer.from([0x01, 0x02]), null, 10]
     )
 

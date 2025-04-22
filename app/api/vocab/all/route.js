@@ -19,8 +19,9 @@ export async function GET(req) {
         SELECT
           id,
           word,
-          translation,
-          description,
+          word_translation,
+          example,
+          example_translation,
           category,
           familiarity,
           createdAt

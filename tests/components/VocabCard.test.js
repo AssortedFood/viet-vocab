@@ -6,10 +6,11 @@ import VocabCard from '../../app/components/VocabCard'
 describe('<VocabCard />', () => {
   const vocab = {
     id: 7,
-    word: 'xin',
-    translation: 'hello',
-    description: 'greeting',
-    category: 'test',
+    word: 'Xin chào',
+    word_translation: 'Hello',
+    example: 'Xin chào mọi người',
+    example_translation: 'Hello everyone',
+    category: 'Greetings',
   }
 
   it('renders all fields and wires up play/delete in view mode', () => {
@@ -19,16 +20,14 @@ describe('<VocabCard />', () => {
     render(
       <VocabCard
         vocab={vocab}
-        editing={false}
         handleDeleteVocab={mockDelete}
         playAudio={mockPlay}
       />
     )
 
     // Content
-    expect(screen.getByText(/xin\s*→\s*hello/)).toBeInTheDocument()
-    expect(screen.getByText(/greeting/)).toBeInTheDocument()
-    expect(screen.getByText(/Category:\s*test/)).toBeInTheDocument()
+    expect(screen.getByText(/xin chào\s*→\s*hello/i)).toBeInTheDocument()
+    expect(screen.getByText(/Category:\s*Greetings/)).toBeInTheDocument()
 
     // Three icon‐buttons: [play word, play desc, delete]
     const buttons = screen.getAllByRole('button')
@@ -38,9 +37,9 @@ describe('<VocabCard />', () => {
     fireEvent.click(buttons[0])
     expect(mockPlay).toHaveBeenCalledWith(vocab.id, 'word_audio')
 
-    // 2️⃣ Play description
+    // 2️⃣ Play example audio
     fireEvent.click(buttons[1])
-    expect(mockPlay).toHaveBeenCalledWith(vocab.id, 'description_audio')
+    expect(mockPlay).toHaveBeenCalledWith(vocab.id, 'example_audio')
 
     // 3️⃣ Delete
     fireEvent.click(buttons[2])
