@@ -1,6 +1,7 @@
 # TODO
 
-- update Dockerfile
+- change backgrounds for light/dark mode to be gradient
+- change cards to have slight transparency
 - add recaptcha
 - tests for recaptcha
 - add support for more auth providers
