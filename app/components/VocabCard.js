@@ -1,10 +1,18 @@
 // app/components/VocabCard.js
 import { Card, CardContent, Typography, IconButton } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import { Delete, VolumeUp } from "@mui/icons-material";
 
 export default function VocabCard({ vocab, handleDeleteVocab, playAudio }) {
   return (
-    <Card sx={{ mb: 1, p: 1 }}>
+    <Card
+      sx={{
+        mb: 1,
+        p: 1,
+        // Slight transparency so background gradient peeks through
+        backgroundColor: (theme) => alpha(theme.palette.background.paper, 0.3),
+      }}
+    >
       <CardContent>
         <Typography variant="h6">
           {vocab.word}

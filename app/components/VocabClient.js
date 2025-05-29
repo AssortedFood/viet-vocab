@@ -98,7 +98,7 @@ export default function VocabClient() {
   }
 
   return (
-    <Container sx={{ p: 2, backgroundColor: "background.default", minHeight: "100vh" }}>
+    <Container sx={{ p: 2, minHeight: "100vh" }}>
       <Button
         variant="contained"
         onClick={() => setShowAddWord((s) => !s)}
