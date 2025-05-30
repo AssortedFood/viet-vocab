@@ -93,9 +93,6 @@ export default function AppThemeProvider({ children }) {
           body: {
             // Fallback solid background
             backgroundColor: tokens.background,
-            // Gradient (top-left → bottom-right)
-            // Light mode: cream to slightly darker cream
-            // Dark mode: primary to background as before
             backgroundImage: mode === 'light'
               ? `linear-gradient(to bottom right, ${tokens.background} 0%, ${tokens.primary} 200%)`
               : `linear-gradient(to bottom right, ${tokens.primary} 0%, ${tokens.background} 100%)`,
